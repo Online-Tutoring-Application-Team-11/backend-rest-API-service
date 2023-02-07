@@ -1,8 +1,0 @@
-
-// Creating the internal table
-
-CREATE TABLE INTERNAL (
-	id int NOT NULL,
-	name varchar(100) NOT NULL,
-	PRIMARY KEY (id)
-);

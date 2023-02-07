@@ -10,8 +10,8 @@
     </parent>
     <groupId>online-tutoring.com.example</groupId>
     <artifactId>team-eleven-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <version>0.0.1</version>
+    <packaging>war</packaging>
     <name>team-eleven-backend</name>
     <description>Backend Service for the Online Tutoring Application</description>
     <properties>
@@ -92,9 +92,9 @@
 
                             <jdbc>
                                 <driver>org.postgresql.Driver</driver>
-                                <url>jdbc:postgresql://34.29.226.28:5432/dev-db</url>
+                                <url>jdbc:postgresql://dev-db.cnyraed9rw6a.us-east-2.rds.amazonaws.com:5432/postgres</url>
                                 <user>postgres</user>
-                                <password>Pass@PostgreSQL</password>
+                                <password>PassPostgresSQL</password>
                             </jdbc>
 
                             <generator>
