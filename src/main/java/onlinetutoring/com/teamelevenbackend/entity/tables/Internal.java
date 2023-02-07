@@ -13,7 +13,6 @@ import onlinetutoring.com.teamelevenbackend.entity.tables.records.InternalRecord
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Function2;
-import org.jooq.Identity;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
@@ -53,7 +52,7 @@ public class Internal extends TableImpl<InternalRecord> {
     /**
      * The column <code>public.internal.id</code>.
      */
-    public final TableField<InternalRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+    public final TableField<InternalRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field("nextval('internal_id'::regclass)", SQLDataType.INTEGER)), this, "");
 
     /**
      * The column <code>public.internal.name</code>.
@@ -96,11 +95,6 @@ public class Internal extends TableImpl<InternalRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<InternalRecord, Integer> getIdentity() {
-        return (Identity<InternalRecord, Integer>) super.getIdentity();
     }
 
     @Override

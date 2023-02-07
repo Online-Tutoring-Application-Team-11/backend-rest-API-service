@@ -18,7 +18,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <skip.jooq.generation>true</skip.jooq.generation>
+        <skip.jooq.generation>false</skip.jooq.generation>
     </properties>
     <dependencies>
         <dependency>
@@ -92,9 +92,9 @@
 
                             <jdbc>
                                 <driver>org.postgresql.Driver</driver>
-                                <url>jdbc:postgresql://34.29.226.28:5432/dev-db</url>
+                                <url>jdbc:postgresql://dev-db.cnyraed9rw6a.us-east-2.rds.amazonaws.com:5432/postgres</url>
                                 <user>postgres</user>
-                                <password>Pass@PostgreSQL</password>
+                                <password>PassPostgresSQL</password>
                             </jdbc>
 
                             <generator>
