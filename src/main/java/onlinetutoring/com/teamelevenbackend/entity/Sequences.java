@@ -19,4 +19,9 @@ public class Sequences {
      * The sequence <code>public.internal_id</code>
      */
     public static final Sequence<Long> INTERNAL_ID = Internal.createSequence("internal_id", Public.PUBLIC, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
+
+    /**
+     * The sequence <code>public.u_id</code>
+     */
+    public static final Sequence<Long> U_ID = Internal.createSequence("u_id", Public.PUBLIC, SQLDataType.BIGINT.nullable(false), null, null, null, null, false, null);
 }

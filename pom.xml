@@ -18,7 +18,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <skip.jooq.generation>true</skip.jooq.generation>
+        <skip.jooq.generation>false</skip.jooq.generation>
     </properties>
     <dependencies>
         <dependency>

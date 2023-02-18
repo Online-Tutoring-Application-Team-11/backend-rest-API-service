@@ -7,7 +7,12 @@ package onlinetutoring.com.teamelevenbackend.entity;
 import java.util.Arrays;
 import java.util.List;
 
+import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
+import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Students;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
 
 import org.jooq.Catalog;
 import org.jooq.Sequence;
@@ -29,9 +34,34 @@ public class Public extends SchemaImpl {
     public static final Public PUBLIC = new Public();
 
     /**
+     * The table <code>public.appointments</code>.
+     */
+    public final Appointments APPOINTMENTS = Appointments.APPOINTMENTS;
+
+    /**
+     * The table <code>public.available_hours</code>.
+     */
+    public final AvailableHours AVAILABLE_HOURS = AvailableHours.AVAILABLE_HOURS;
+
+    /**
      * The table <code>public.internal</code>.
      */
     public final Internal INTERNAL = Internal.INTERNAL;
+
+    /**
+     * The table <code>public.students</code>.
+     */
+    public final Students STUDENTS = Students.STUDENTS;
+
+    /**
+     * The table <code>public.tutors</code>.
+     */
+    public final Tutors TUTORS = Tutors.TUTORS;
+
+    /**
+     * The table <code>public.users</code>.
+     */
+    public final Users USERS = Users.USERS;
 
     /**
      * No further instances allowed
@@ -49,14 +79,20 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Sequence<?>> getSequences() {
         return Arrays.asList(
-            Sequences.INTERNAL_ID
+            Sequences.INTERNAL_ID,
+            Sequences.U_ID
         );
     }
 
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            Internal.INTERNAL
+            Appointments.APPOINTMENTS,
+            AvailableHours.AVAILABLE_HOURS,
+            Internal.INTERNAL,
+            Students.STUDENTS,
+            Tutors.TUTORS,
+            Users.USERS
         );
     }
 }
