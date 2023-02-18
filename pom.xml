@@ -10,7 +10,7 @@
     </parent>
     <groupId>online-tutoring.com.example</groupId>
     <artifactId>team-eleven-backend</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <packaging>war</packaging>
     <name>team-eleven-backend</name>
     <description>Backend Service for the Online Tutoring Application</description>
@@ -18,7 +18,7 @@
         <java.version>17</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <skip.jooq.generation>false</skip.jooq.generation>
+        <skip.jooq.generation>true</skip.jooq.generation>
     </properties>
     <dependencies>
         <dependency>
