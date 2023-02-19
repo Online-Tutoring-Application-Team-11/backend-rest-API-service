@@ -4,7 +4,12 @@
 package onlinetutoring.com.teamelevenbackend.entity;
 
 
+import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
+import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Students;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
 
 
 /**
@@ -14,7 +19,32 @@ import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
 public class Tables {
 
     /**
+     * The table <code>public.appointments</code>.
+     */
+    public static final Appointments APPOINTMENTS = Appointments.APPOINTMENTS;
+
+    /**
+     * The table <code>public.available_hours</code>.
+     */
+    public static final AvailableHours AVAILABLE_HOURS = AvailableHours.AVAILABLE_HOURS;
+
+    /**
      * The table <code>public.internal</code>.
      */
     public static final Internal INTERNAL = Internal.INTERNAL;
+
+    /**
+     * The table <code>public.students</code>.
+     */
+    public static final Students STUDENTS = Students.STUDENTS;
+
+    /**
+     * The table <code>public.tutors</code>.
+     */
+    public static final Tutors TUTORS = Tutors.TUTORS;
+
+    /**
+     * The table <code>public.users</code>.
+     */
+    public static final Users USERS = Users.USERS;
 }

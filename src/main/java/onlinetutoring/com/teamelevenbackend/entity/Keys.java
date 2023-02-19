@@ -4,12 +4,23 @@
 package onlinetutoring.com.teamelevenbackend.entity;
 
 
-import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
+import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Students;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
+import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AvailableHoursRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.InternalRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 
+import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 
 
 /**
@@ -23,5 +34,21 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<InternalRecord> INTERNAL_PKEY = org.jooq.impl.Internal.createUniqueKey(Internal.INTERNAL, DSL.name("internal_pkey"), new TableField[] { Internal.INTERNAL.ID }, true);
+    public static final UniqueKey<AvailableHoursRecord> AVAILABLE_HOURS_PKEY = Internal.createUniqueKey(AvailableHours.AVAILABLE_HOURS, DSL.name("available_hours_pkey"), new TableField[] { AvailableHours.AVAILABLE_HOURS.TUTOR_ID }, true);
+    public static final UniqueKey<InternalRecord> INTERNAL_PKEY = Internal.createUniqueKey(onlinetutoring.com.teamelevenbackend.entity.tables.Internal.INTERNAL, DSL.name("internal_pkey"), new TableField[] { onlinetutoring.com.teamelevenbackend.entity.tables.Internal.INTERNAL.ID }, true);
+    public static final UniqueKey<StudentsRecord> STUDENTS_PKEY = Internal.createUniqueKey(Students.STUDENTS, DSL.name("students_pkey"), new TableField[] { Students.STUDENTS.ID }, true);
+    public static final UniqueKey<TutorsRecord> TUTORS_PKEY = Internal.createUniqueKey(Tutors.TUTORS, DSL.name("tutors_pkey"), new TableField[] { Tutors.TUTORS.ID }, true);
+    public static final UniqueKey<UsersRecord> USERS_EMAIL_KEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_email_key"), new TableField[] { Users.USERS.EMAIL }, true);
+    public static final UniqueKey<UsersRecord> USERS_PKEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_pkey"), new TableField[] { Users.USERS.ID }, true);
+    public static final UniqueKey<UsersRecord> USERS_PROFILE_PIC_KEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_profile_pic_key"), new TableField[] { Users.USERS.PROFILE_PIC }, true);
+
+    // -------------------------------------------------------------------------
+    // FOREIGN KEY definitions
+    // -------------------------------------------------------------------------
+
+    public static final ForeignKey<AppointmentsRecord, StudentsRecord> APPOINTMENTS__APPOINTMENTS_STUDENT_ID_FKEY = Internal.createForeignKey(Appointments.APPOINTMENTS, DSL.name("appointments_student_id_fkey"), new TableField[] { Appointments.APPOINTMENTS.STUDENT_ID }, Keys.STUDENTS_PKEY, new TableField[] { Students.STUDENTS.ID }, true);
+    public static final ForeignKey<AppointmentsRecord, TutorsRecord> APPOINTMENTS__APPOINTMENTS_TUTOR_ID_FKEY = Internal.createForeignKey(Appointments.APPOINTMENTS, DSL.name("appointments_tutor_id_fkey"), new TableField[] { Appointments.APPOINTMENTS.TUTOR_ID }, Keys.TUTORS_PKEY, new TableField[] { Tutors.TUTORS.ID }, true);
+    public static final ForeignKey<AvailableHoursRecord, TutorsRecord> AVAILABLE_HOURS__AVAILABLE_HOURS_TUTOR_ID_FKEY = Internal.createForeignKey(AvailableHours.AVAILABLE_HOURS, DSL.name("available_hours_tutor_id_fkey"), new TableField[] { AvailableHours.AVAILABLE_HOURS.TUTOR_ID }, Keys.TUTORS_PKEY, new TableField[] { Tutors.TUTORS.ID }, true);
+    public static final ForeignKey<StudentsRecord, UsersRecord> STUDENTS__STUDENTS_ID_FKEY = Internal.createForeignKey(Students.STUDENTS, DSL.name("students_id_fkey"), new TableField[] { Students.STUDENTS.ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.ID }, true);
+    public static final ForeignKey<TutorsRecord, UsersRecord> TUTORS__TUTORS_ID_FKEY = Internal.createForeignKey(Tutors.TUTORS, DSL.name("tutors_id_fkey"), new TableField[] { Tutors.TUTORS.ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.ID }, true);
 }
