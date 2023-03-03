@@ -137,6 +137,7 @@ public class AvailableHours extends TableImpl<AvailableHoursRecord> {
     @Override
     public List<Check<AvailableHoursRecord>> getChecks() {
         return Arrays.asList(
+            Internal.createCheck(this, DSL.name("day_constraint"), "(((day_of_week)::text = ANY ((ARRAY['sunday'::character varying, 'monday'::character varying, 'tuesday'::character varying, 'wednesday'::character varying, 'thursday'::character varying, 'friday'::character varying, 'saturday'::character varying])::text[])))", true),
             Internal.createCheck(this, DSL.name("time_validator"), "((end_time > start_time))", true)
         );
     }
