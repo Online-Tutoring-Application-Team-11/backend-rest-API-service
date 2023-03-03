@@ -25,6 +25,9 @@ public class AuthService {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private TutorService tutorService;
+
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
         if (StringUtils.isEmpty(userSignupRequest.getEmail())
                 || StringUtils.isEmpty(userSignupRequest.getPassword())
@@ -53,7 +56,9 @@ public class AuthService {
             }
 
             if (userSignupRequest.isTutor()) {
-
+                if (!tutorService.insertIntoTutors(resUser.get(0).getId(), Collections.emptyList())) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
             } else {
                 if (!studentService.insertIntoStudents(resUser.get(0).getId(), Collections.emptyList(), 0)) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

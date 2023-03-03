@@ -74,7 +74,6 @@ public class StudentService {
             return false;
         }
 
-        // insert into students
         dslContext.insertInto(STUDENTS)
                 .set(STUDENTS.ID, id)
                 .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[100]))
