@@ -1,6 +1,5 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.CreateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.api.models.UpdateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
@@ -67,61 +66,6 @@ public class StudentService {
 
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
-        }
-    }
-
-    public ResponseEntity<StudentUser> createStudent(CreateStudentRequest createStudentRequest) throws SQLException {
-        if (StringUtils.isEmpty(createStudentRequest.getEmail())
-                || StringUtils.isEmpty(createStudentRequest.getPassword())
-                || StringUtils.isEmpty(createStudentRequest.getfName())
-        || this.isInvalidYear(createStudentRequest.getYear())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(createStudentRequest.getEmail()));
-
-            // user already exists
-            if (resUserBefore.isNotEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            // insert into user
-            dslContext.insertInto(USERS, USERS.EMAIL, USERS.F_NAME, USERS.L_NAME, USERS.PASSWORD, USERS.ABOUT_ME, USERS.TUTOR, USERS.TOTAL_HOURS, USERS.PROFILE_PIC)
-                    .values(createStudentRequest.getEmail(), createStudentRequest.getfName(), createStudentRequest.getlName(), createStudentRequest.getPassword(), createStudentRequest.getAboutMe(), false, 0, createStudentRequest.getProfilePic())
-                    .execute();
-
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(createStudentRequest.getEmail()));
-
-            // check if insert failed
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            UsersRecord ru = resUser.get(0);
-
-            // insert into students
-            dslContext.insertInto(STUDENTS)
-                    .set(STUDENTS.ID, ru.getId())
-                    .set(STUDENTS.FAVOURITE_TUTOR_IDS, new Integer[100])
-                    .set(STUDENTS.YEAR, createStudentRequest.getYear())
-                    .execute();
-            // NOTE: Maximum fav tutors for a student is 100
-
-            Result<StudentsRecord> resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(ru.getId()));
-
-            // check if insert failed
-            if (resStudent.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            StudentUser response = this.buildStudentUser(ru, resStudent.get(0));
-            if (response == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception ex) {
-            throw new SQLException("Could not insert into student table", ex);
         }
     }
 
