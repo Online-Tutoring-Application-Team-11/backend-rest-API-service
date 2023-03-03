@@ -34,4 +34,17 @@ public class TutorService {
 
         return finalTutorList;
     }
+
+    public boolean insertIntoTutors(int id, List<String> subjects) {
+        dslContext.insertInto(TUTORS)
+                .set(TUTORS.ID, id)
+                .set(TUTORS.SUBJECTS, subjects.toArray(new String[100]))
+                .execute();
+        // NOTE: Maximum subjects taught by a tutor is 100
+
+        Result<TutorsRecord> resTutors = dslContext.fetch(TUTORS, TUTORS.ID.eq(id));
+
+        // check if insert failed
+        return !resTutors.isEmpty();
+    }
 }

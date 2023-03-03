@@ -1,6 +1,5 @@
 package onlinetutoring.com.teamelevenbackend.api;
 
-import onlinetutoring.com.teamelevenbackend.api.models.CreateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.api.models.UpdateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.models.StudentUser;
 import onlinetutoring.com.teamelevenbackend.service.StudentService;
@@ -22,15 +21,6 @@ public class StudentApis {
     public ResponseEntity<StudentUser> getStudent(@PathVariable("email") String email) {
         try {
             return studentService.getStudentByEmail(email);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PostMapping(value = "/create")
-    public ResponseEntity<StudentUser> createStudent(@RequestBody CreateStudentRequest createStudentRequest) {
-        try {
-            return studentService.createStudent(createStudentRequest);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

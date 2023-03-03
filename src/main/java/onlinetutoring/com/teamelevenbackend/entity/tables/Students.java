@@ -131,7 +131,8 @@ public class Students extends TableImpl<StudentsRecord> {
     @Override
     public List<Check<StudentsRecord>> getChecks() {
         return Arrays.asList(
-            Internal.createCheck(this, DSL.name("four_years_and_default"), "((year = ANY (ARRAY[0, 1, 2, 3, 4])))", true)
+            Internal.createCheck(this, DSL.name("four_years_and_default"), "((year = ANY (ARRAY[0, 1, 2, 3, 4])))", true),
+            Internal.createCheck(this, DSL.name("not_tutors"), "((checkifnottutor(id) IS TRUE))", true)
         );
     }
 
