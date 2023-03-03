@@ -12,7 +12,6 @@ import onlinetutoring.com.teamelevenbackend.entity.Keys;
 import onlinetutoring.com.teamelevenbackend.entity.Public;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 
-import org.jooq.Check;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Function3;
@@ -27,7 +26,6 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -126,13 +124,6 @@ public class Students extends TableImpl<StudentsRecord> {
             _users = new Users(this, Keys.STUDENTS__STUDENTS_ID_FKEY);
 
         return _users;
-    }
-
-    @Override
-    public List<Check<StudentsRecord>> getChecks() {
-        return Arrays.asList(
-            Internal.createCheck(this, DSL.name("four_years_and_default"), "((year = ANY (ARRAY[0, 1, 2, 3, 4])))", true)
-        );
     }
 
     @Override
