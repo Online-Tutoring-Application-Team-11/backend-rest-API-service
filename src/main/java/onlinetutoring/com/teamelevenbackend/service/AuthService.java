@@ -61,7 +61,7 @@ public class AuthService {
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
 
             // check if insert failed
-            if (resUser.isEmpty() || resUser.get(0) == null) {
+            if (resUser.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             UsersRecord user = resUser.get(0);
@@ -92,7 +92,7 @@ public class AuthService {
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(loginRequest.getEmail()));
 
             // user does not exist
-            if (resUser.isEmpty() || resUser.get(0) == null) {
+            if (resUser.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             UsersRecord user = resUser.get(0);

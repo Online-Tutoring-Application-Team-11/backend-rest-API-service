@@ -1,6 +1,5 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jooq.DSLContext;

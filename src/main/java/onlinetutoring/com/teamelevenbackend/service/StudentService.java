@@ -4,6 +4,7 @@ import onlinetutoring.com.teamelevenbackend.api.models.UpdateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.StudentUser;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -23,6 +24,8 @@ import java.util.List;
 @Service
 public class StudentService {
 
+    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
+
     @Autowired
     private DSLContext dslContext;
 
@@ -38,13 +41,13 @@ public class StudentService {
 
         try {
             Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty() || userData.get(0) == null) {
+            if (userData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             UsersRecord usersRecord = userData.get(0);
 
             Result<StudentsRecord> studentData = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(usersRecord.getId()));
-            if (studentData.isEmpty() || studentData.get(0) == null) {
+            if (studentData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
@@ -62,7 +65,7 @@ public class StudentService {
 
         dslContext.insertInto(STUDENTS)
                 .set(STUDENTS.ID, id)
-                .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[100]))
+                .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[0]))
                 .set(STUDENTS.YEAR, year)
                 .execute();
         // NOTE: Maximum fav tutors for a student is 100
@@ -81,10 +84,9 @@ public class StudentService {
         try {
             // check if exists
             Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty() || userData.get(0) == null) {
+            if (userData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
             UsersRecord usersRecord = userData.get(0);
 
             dslContext.deleteFrom(STUDENTS).where(STUDENTS.ID.eq(usersRecord.getId())).execute();
@@ -92,6 +94,7 @@ public class StudentService {
             dslContext.deleteFrom(USERS).where(USERS.ID.eq(usersRecord.getId())).execute();
 
             userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
+
             // deletion failed
             if (userData.isNotEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -122,7 +125,7 @@ public class StudentService {
                     .set(USERS.L_NAME, updateStudentRequest.getlName())
                     .set(USERS.PROFILE_PIC, updateStudentRequest.getProfilePic())
                     .set(USERS.ABOUT_ME, updateStudentRequest.getAboutMe())
-                    .set(USERS.PASSWORD, updateStudentRequest.getPassword())
+                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(updateStudentRequest.getPassword()))
                     .where(USERS.EMAIL.eq(updateStudentRequest.getEmail()))
                     .execute();
 
@@ -130,7 +133,7 @@ public class StudentService {
 
             // update students
             dslContext.update(STUDENTS)
-                    .set(STUDENTS.FAVOURITE_TUTOR_IDS, updateStudentRequest.getFavouriteTutorIds().toArray(new Integer[100]))
+                    .set(STUDENTS.FAVOURITE_TUTOR_IDS, updateStudentRequest.getFavouriteTutorIds().toArray(new Integer[0]))
                     .set(STUDENTS.YEAR, updateStudentRequest.getYear())
                     .where(STUDENTS.ID.eq(resUser.getId()))
                     .execute();
@@ -144,12 +147,6 @@ public class StudentService {
     }
 
     private StudentUser buildStudentUser(UsersRecord usersRecord, StudentsRecord studentsRecord) {
-/*
-        A LOT OF NPE CHECKS ARE NOT BEING DONE BECAUSE THE APIs ARE GETTING SLOW!
-        SINCE THIS IS BUILT BY US, WE ARE CONTROLLING THE DATA FLOW
-        HENCE, THESE CHECKS ARE NOT REQUIRED
-*/
-
         // user data
         StudentUser response = new StudentUser();
 
