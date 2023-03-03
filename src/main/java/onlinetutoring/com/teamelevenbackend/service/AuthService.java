@@ -4,6 +4,7 @@ import onlinetutoring.com.teamelevenbackend.api.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.api.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -19,6 +20,8 @@ import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 
 @Service
 public class AuthService {
+
+    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
     @Autowired
     private DSLContext dslContext;
@@ -46,7 +49,7 @@ public class AuthService {
 
             // insert into user
             dslContext.insertInto(USERS, USERS.EMAIL, USERS.F_NAME, USERS.L_NAME, USERS.PASSWORD, USERS.ABOUT_ME, USERS.TUTOR, USERS.TOTAL_HOURS, USERS.PROFILE_PIC)
-                    .values(userSignupRequest.getEmail(), userSignupRequest.getfName(), userSignupRequest.getlName(), userSignupRequest.getPassword(), userSignupRequest.getAboutMe(), userSignupRequest.isTutor(), 0, userSignupRequest.getProfilePic())
+                    .values(userSignupRequest.getEmail(), userSignupRequest.getfName(), userSignupRequest.getlName(), PASSWORD_ENCRYPTOR.encryptPassword(userSignupRequest.getPassword()), userSignupRequest.getAboutMe(), userSignupRequest.isTutor(), 0, userSignupRequest.getProfilePic())
                     .execute();
 
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
@@ -92,7 +95,7 @@ public class AuthService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            if (!loginRequest.getPassword().equals(resUser.get(0).getPassword())) {
+            if (!PASSWORD_ENCRYPTOR.checkPassword(loginRequest.getPassword(), resUser.get(0).getPassword())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
@@ -119,7 +122,8 @@ public class AuthService {
         response.setFName(usersRecord.getFName());
         response.setLName(usersRecord.getLName());
         response.setEmail(usersRecord.getEmail());
-        response.setPassword(usersRecord.getPassword());
+        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
+        response.setPassword(null);
         response.setTotalHours(usersRecord.getTotalHours());
         response.setTutor(usersRecord.getTutor());
         response.setProfilePic(usersRecord.getProfilePic());
