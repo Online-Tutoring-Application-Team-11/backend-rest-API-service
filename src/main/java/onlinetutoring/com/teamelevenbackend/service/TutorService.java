@@ -38,7 +38,7 @@ public class TutorService {
     public boolean insertIntoTutors(int id, List<String> subjects) {
         dslContext.insertInto(TUTORS)
                 .set(TUTORS.ID, id)
-                .set(TUTORS.SUBJECTS, subjects.toArray(new String[100]))
+                .set(TUTORS.SUBJECTS, subjects.toArray(new String[0]))
                 .execute();
         // NOTE: Maximum subjects taught by a tutor is 100
 
