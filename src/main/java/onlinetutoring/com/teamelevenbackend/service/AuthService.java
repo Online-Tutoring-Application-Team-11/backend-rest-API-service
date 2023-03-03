@@ -78,7 +78,7 @@ public class AuthService {
 
             return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
-            throw new SQLException("Could not insert into student table", ex);
+            throw new SQLException("Signup Failure", ex);
         }
     }
 
@@ -103,7 +103,7 @@ public class AuthService {
 
             return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
-            throw new SQLException("Could not insert into student table", ex);
+            throw new SQLException("Login Failure", ex);
         }
     }
 
