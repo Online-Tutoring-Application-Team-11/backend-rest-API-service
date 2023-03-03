@@ -47,9 +47,15 @@ public class AuthService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            // insert into user
-            dslContext.insertInto(USERS, USERS.EMAIL, USERS.F_NAME, USERS.L_NAME, USERS.PASSWORD, USERS.ABOUT_ME, USERS.TUTOR, USERS.TOTAL_HOURS, USERS.PROFILE_PIC)
-                    .values(userSignupRequest.getEmail(), userSignupRequest.getfName(), userSignupRequest.getlName(), PASSWORD_ENCRYPTOR.encryptPassword(userSignupRequest.getPassword()), userSignupRequest.getAboutMe(), userSignupRequest.isTutor(), 0, userSignupRequest.getProfilePic())
+            // insert into user (profilePic and aboutMe are set as null initially)
+            dslContext.insertInto(USERS, USERS.EMAIL,
+                            USERS.F_NAME, USERS.L_NAME,
+                            USERS.PASSWORD,
+                            USERS.ABOUT_ME, USERS.TUTOR, USERS.TOTAL_HOURS, USERS.PROFILE_PIC)
+                    .values(userSignupRequest.getEmail(),
+                            userSignupRequest.getfName(), userSignupRequest.getlName(),
+                            PASSWORD_ENCRYPTOR.encryptPassword(userSignupRequest.getPassword()),
+                            null, userSignupRequest.isTutor(), 0, null)
                     .execute();
 
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
