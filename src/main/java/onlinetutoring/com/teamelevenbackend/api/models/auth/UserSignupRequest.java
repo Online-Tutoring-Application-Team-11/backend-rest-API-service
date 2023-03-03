@@ -1,16 +1,8 @@
-package onlinetutoring.com.teamelevenbackend.api.models;
+package onlinetutoring.com.teamelevenbackend.api.models.auth;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-public class UserSignupRequest implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class UserSignupRequest extends AbstractAuthModel {
     private String fName;
     private String lName;
-    private String email;
-    private String password;
     private boolean tutor;
     private String profilePic;
     private String aboutMe;
@@ -21,14 +13,6 @@ public class UserSignupRequest implements Serializable {
 
     public String getlName() {
         return lName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public boolean isTutor() {

@@ -1,6 +1,7 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.UserSignupRequest;
+import onlinetutoring.com.teamelevenbackend.api.models.auth.LoginRequest;
+import onlinetutoring.com.teamelevenbackend.api.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import org.jooq.DSLContext;
@@ -63,6 +64,36 @@ public class AuthService {
                 if (!studentService.insertIntoStudents(resUser.get(0).getId(), Collections.emptyList(), 0)) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
+            }
+
+            Users response = this.buildUser(resUser.get(0));
+
+            if (response == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Could not insert into student table", ex);
+        }
+    }
+
+    public ResponseEntity<Users> login(LoginRequest loginRequest) throws SQLException {
+        if (StringUtils.isEmpty(loginRequest.getEmail())
+                || StringUtils.isEmpty(loginRequest.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(loginRequest.getEmail()));
+
+            // user does not exist
+            if (resUser.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (!loginRequest.getPassword().equals(resUser.get(0).getPassword())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             Users response = this.buildUser(resUser.get(0));

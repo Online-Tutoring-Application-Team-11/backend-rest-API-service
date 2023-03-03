@@ -43,25 +43,13 @@ public class StudentService {
             }
 
             UsersRecord usersRecord = userData.get(0);
+
             Result<StudentsRecord> studentData = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(usersRecord.getId()));
+            if (studentData.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-            StudentUser response = new StudentUser();
-
-            // user data
-            response.setId(usersRecord.getId());
-            response.setFName(usersRecord.getFName());
-            response.setLName(usersRecord.getLName());
-            response.setEmail(email);
-            response.setPassword(null);
-            response.setTotalHours(usersRecord.getTotalHours());
-            response.setTutor(false);
-            response.setProfilePic(usersRecord.getProfilePic());
-            response.setAboutMe(usersRecord.getAboutMe());
-
-            // student data
-            response.setFavouriteTutorIds(tutorService.validateIsTutor(Arrays.asList(studentData.get(0).getFavouriteTutorIds())));
-            response.setYear(studentData.get(0).getYear());
-
+            StudentUser response = this.buildStudentUser(usersRecord, studentData.get(0));
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception ex) {
@@ -178,9 +166,10 @@ public class StudentService {
         response.setFName(usersRecord.getFName());
         response.setLName(usersRecord.getLName());
         response.setEmail(usersRecord.getEmail());
-        response.setPassword(usersRecord.getPassword());
+        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
+        response.setPassword(null);
         response.setTotalHours(usersRecord.getTotalHours());
-        response.setTutor(usersRecord.getTutor());
+        response.setTutor(false);
         response.setProfilePic(usersRecord.getProfilePic());
         response.setAboutMe(usersRecord.getAboutMe());
 
