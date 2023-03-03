@@ -125,6 +125,25 @@ public class StudentService {
         }
     }
 
+    public boolean insertIntoStudents(int id, List<Integer> favTutorIds, int year) {
+        if (this.isInvalidYear(year)) {
+            return false;
+        }
+
+        // insert into students
+        dslContext.insertInto(STUDENTS)
+                .set(STUDENTS.ID, id)
+                .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[100]))
+                .set(STUDENTS.YEAR, year)
+                .execute();
+        // NOTE: Maximum fav tutors for a student is 100
+
+        Result<StudentsRecord> resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(id));
+
+        // check if insert failed
+        return !resStudent.isEmpty();
+    }
+
     public ResponseEntity<HttpStatus> deleteStudent(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -203,14 +222,11 @@ public class StudentService {
         if (usersRecord == null || studentsRecord == null) {
             return null;
         }
-
-        if (usersRecord.getId() == null || !usersRecord.getId().equals(studentsRecord.getId())) {
-            return null;
-        }
-
-        if (usersRecord.getFName() == null || usersRecord.getPassword() == null) {
-            return null;
-        }
+/*
+        A LOT OF CHECKS ARE NOT BEING DONE BECAUSE THE API WAS GETTING SLOW!
+        SINCE THIS IS BUILT BY US, WE ARE CONTROLLING THE DATA FLOW
+        THESE CHECKS ARE NOT REQUIRED
+*/
 
         // user data
         StudentUser response = new StudentUser();

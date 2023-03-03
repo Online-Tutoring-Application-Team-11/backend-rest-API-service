@@ -27,6 +27,7 @@ public class StudentApis {
         }
     }
 
+    @Deprecated(forRemoval = true)
     @PostMapping(value = "/create")
     public ResponseEntity<StudentUser> createStudent(@RequestBody CreateStudentRequest createStudentRequest) {
         try {
