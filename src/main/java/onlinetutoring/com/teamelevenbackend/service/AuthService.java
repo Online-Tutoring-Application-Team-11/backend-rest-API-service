@@ -61,27 +61,22 @@ public class AuthService {
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
 
             // check if insert failed
-            if (resUser.isEmpty()) {
+            if (resUser.isEmpty() || resUser.get(0) == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
+            UsersRecord user = resUser.get(0);
 
             if (userSignupRequest.isTutor()) {
-                if (!tutorService.insertIntoTutors(resUser.get(0).getId(), Collections.emptyList())) {
+                if (!tutorService.insertIntoTutors(user.getId(), Collections.emptyList())) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
             } else {
-                if (!studentService.insertIntoStudents(resUser.get(0).getId(), Collections.emptyList(), 0)) {
+                if (!studentService.insertIntoStudents(user.getId(), Collections.emptyList(), 0)) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
             }
 
-            Users response = this.buildUser(resUser.get(0));
-
-            if (response == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not insert into student table", ex);
         }
@@ -97,31 +92,22 @@ public class AuthService {
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(loginRequest.getEmail()));
 
             // user does not exist
-            if (resUser.isEmpty()) {
+            if (resUser.isEmpty() || resUser.get(0) == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            UsersRecord user = resUser.get(0);
+
+            if (!PASSWORD_ENCRYPTOR.checkPassword(loginRequest.getPassword(), user.getPassword())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            if (!PASSWORD_ENCRYPTOR.checkPassword(loginRequest.getPassword(), resUser.get(0).getPassword())) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            Users response = this.buildUser(resUser.get(0));
-
-            if (response == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not insert into student table", ex);
         }
     }
 
     private Users buildUser(UsersRecord usersRecord) {
-        if (usersRecord == null) {
-            return null;
-        }
-
         Users response = new Users();
 
         response.setId(usersRecord.getId());

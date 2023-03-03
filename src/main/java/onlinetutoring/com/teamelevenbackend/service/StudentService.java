@@ -38,19 +38,17 @@ public class StudentService {
 
         try {
             Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
+            if (userData.isEmpty() || userData.get(0) == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
             UsersRecord usersRecord = userData.get(0);
 
             Result<StudentsRecord> studentData = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(usersRecord.getId()));
-            if (studentData.isEmpty()) {
+            if (studentData.isEmpty() || studentData.get(0) == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            StudentUser response = this.buildStudentUser(usersRecord, studentData.get(0));
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(this.buildStudentUser(usersRecord, studentData.get(0)), HttpStatus.OK);
 
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
@@ -83,11 +81,12 @@ public class StudentService {
         try {
             // check if exists
             Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
+            if (userData.isEmpty() || userData.get(0) == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
             UsersRecord usersRecord = userData.get(0);
+
             dslContext.deleteFrom(STUDENTS).where(STUDENTS.ID.eq(usersRecord.getId())).execute();
 
             dslContext.deleteFrom(USERS).where(USERS.ID.eq(usersRecord.getId())).execute();
@@ -138,25 +137,17 @@ public class StudentService {
 
             StudentsRecord resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(resUser.getId())).get(0);
 
-            StudentUser response = this.buildStudentUser(resUser, resStudent);
-            if (response == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(this.buildStudentUser(resUser, resStudent), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update student", ex);
         }
     }
 
     private StudentUser buildStudentUser(UsersRecord usersRecord, StudentsRecord studentsRecord) {
-        if (usersRecord == null || studentsRecord == null) {
-            return null;
-        }
 /*
-        A LOT OF CHECKS ARE NOT BEING DONE BECAUSE THE API WAS GETTING SLOW!
+        A LOT OF NPE CHECKS ARE NOT BEING DONE BECAUSE THE APIs ARE GETTING SLOW!
         SINCE THIS IS BUILT BY US, WE ARE CONTROLLING THE DATA FLOW
-        THESE CHECKS ARE NOT REQUIRED
+        HENCE, THESE CHECKS ARE NOT REQUIRED
 */
 
         // user data
