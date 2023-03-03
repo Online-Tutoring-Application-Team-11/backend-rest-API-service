@@ -58,22 +58,26 @@ public class StudentService {
         }
     }
 
-    public boolean insertIntoStudents(int id, List<Integer> favTutorIds, int year) {
-        if (this.isInvalidYear(year)) {
-            return false;
+    public boolean insertIntoStudents(int id, List<Integer> favTutorIds, int year) throws SQLException {
+        try {
+            if (this.isInvalidYear(year)) {
+                return false;
+            }
+
+            dslContext.insertInto(STUDENTS)
+                    .set(STUDENTS.ID, id)
+                    .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[0]))
+                    .set(STUDENTS.YEAR, year)
+                    .execute();
+            // NOTE: Maximum fav tutors for a student is 100
+
+            Result<StudentsRecord> resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(id));
+
+            // check if insert failed
+            return !resStudent.isEmpty();
+        } catch (Exception ex) {
+            throw new SQLException("Could not insert data into students", ex);
         }
-
-        dslContext.insertInto(STUDENTS)
-                .set(STUDENTS.ID, id)
-                .set(STUDENTS.FAVOURITE_TUTOR_IDS, favTutorIds.toArray(new Integer[0]))
-                .set(STUDENTS.YEAR, year)
-                .execute();
-        // NOTE: Maximum fav tutors for a student is 100
-
-        Result<StudentsRecord> resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(id));
-
-        // check if insert failed
-        return !resStudent.isEmpty();
     }
 
     public ResponseEntity<HttpStatus> deleteStudent(String email) throws SQLException {
@@ -147,9 +151,9 @@ public class StudentService {
     }
 
     private StudentUser buildStudentUser(UsersRecord usersRecord, StudentsRecord studentsRecord) {
-        // user data
         StudentUser response = new StudentUser();
 
+        // user data
         response.setId(usersRecord.getId());
         response.setFName(usersRecord.getFName());
         response.setLName(usersRecord.getLName());
