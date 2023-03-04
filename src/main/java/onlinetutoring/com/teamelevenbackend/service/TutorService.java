@@ -9,7 +9,7 @@ import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,11 +20,14 @@ import java.util.List;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 
-@Service
+@Component
 public class TutorService {
 
-    @Autowired
     private DSLContext dslContext;
+    @Autowired
+    public void setDslContext(DSLContext dslContext) {
+        this.dslContext = dslContext;
+    }
 
     public ResponseEntity<List<TutorUser>> getAllTutors() throws SQLException {
         try {

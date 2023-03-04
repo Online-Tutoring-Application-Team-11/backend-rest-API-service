@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/students")
 public class StudentApis {
 
-    @Autowired
     private StudentService studentService;
+    @Autowired
+    public void setStudentService(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     @GetMapping(value = "/get/{email}")
     public ResponseEntity<StudentUser> getStudent(@PathVariable("email") String email) {

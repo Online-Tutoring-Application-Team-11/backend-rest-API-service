@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthApis {
 
-    @Autowired
     private AuthService authService;
+    @Autowired
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
 
     @PostMapping(value = "/signup")
     public ResponseEntity<Users> signup(@RequestBody UserSignupRequest userSignupRequest) {
