@@ -1,20 +1,22 @@
 package onlinetutoring.com.teamelevenbackend.api;
 
-import onlinetutoring.com.teamelevenbackend.service.BaseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
 public class Version {
 
-    @Autowired
-    private BaseService baseService;
+    private static final String PROJECT_VERSION = "V1";
 
-    @GetMapping(value = "/version")
-    public String getVersion() {
-        return baseService.applicationVersion();
+    @GetMapping(value = "/api/version")
+    public ResponseEntity<String> getVersion() {
+        return new ResponseEntity<>(PROJECT_VERSION, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "")
+    public ResponseEntity<String> basePath() {
+        return new ResponseEntity<>(PROJECT_VERSION, HttpStatus.OK);
     }
 }
