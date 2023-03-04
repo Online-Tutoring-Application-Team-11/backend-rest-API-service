@@ -11,7 +11,7 @@
     <groupId>online-tutoring.com.example</groupId>
     <artifactId>team-eleven-backend</artifactId>
     <version>0.0.4</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>team-eleven-backend</name>
     <description>Backend Service for the Online Tutoring Application</description>
     <properties>
