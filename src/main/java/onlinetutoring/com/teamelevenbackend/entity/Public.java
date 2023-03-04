@@ -9,7 +9,6 @@ import java.util.List;
 
 import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
 import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
-import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Students;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
@@ -42,11 +41,6 @@ public class Public extends SchemaImpl {
      * The table <code>public.available_hours</code>.
      */
     public final AvailableHours AVAILABLE_HOURS = AvailableHours.AVAILABLE_HOURS;
-
-    /**
-     * The table <code>public.internal</code>.
-     */
-    public final Internal INTERNAL = Internal.INTERNAL;
 
     /**
      * The table <code>public.students</code>.
@@ -89,7 +83,6 @@ public class Public extends SchemaImpl {
         return Arrays.asList(
             Appointments.APPOINTMENTS,
             AvailableHours.AVAILABLE_HOURS,
-            Internal.INTERNAL,
             Students.STUDENTS,
             Tutors.TUTORS,
             Users.USERS
