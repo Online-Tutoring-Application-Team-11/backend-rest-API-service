@@ -14,11 +14,14 @@ import java.util.List;
 
 @Controller
 @RestController
-@RequestMapping("/api/tutors")
+@RequestMapping("/tutors")
 public class TutorApis {
 
-    @Autowired
     private TutorService tutorService;
+    @Autowired
+    public void setTutorService(TutorService tutorService) {
+        this.tutorService = tutorService;
+    }
 
     @GetMapping(value = "/get/all")
     public ResponseEntity<List<TutorUser>> getTutors() {

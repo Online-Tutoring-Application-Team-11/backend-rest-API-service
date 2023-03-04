@@ -11,7 +11,7 @@ public class Version {
     private static final String PROJECT_VERSION = "V1";
     private static final String ERROR_INFO = "Invalid Endpoint Hit OR Database Failure OR Deployment Crashed";
 
-    @GetMapping(value = "/api/version")
+    @GetMapping(value = "/version")
     public ResponseEntity<String> getVersion() {
         return new ResponseEntity<>(PROJECT_VERSION, HttpStatus.OK);
     }
