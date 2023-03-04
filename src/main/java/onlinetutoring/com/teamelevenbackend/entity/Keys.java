@@ -11,7 +11,6 @@ import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.AvailableHoursRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.InternalRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
@@ -35,7 +34,6 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<AvailableHoursRecord> AVAILABLE_HOURS_PKEY = Internal.createUniqueKey(AvailableHours.AVAILABLE_HOURS, DSL.name("available_hours_pkey"), new TableField[] { AvailableHours.AVAILABLE_HOURS.TUTOR_ID }, true);
-    public static final UniqueKey<InternalRecord> INTERNAL_PKEY = Internal.createUniqueKey(onlinetutoring.com.teamelevenbackend.entity.tables.Internal.INTERNAL, DSL.name("internal_pkey"), new TableField[] { onlinetutoring.com.teamelevenbackend.entity.tables.Internal.INTERNAL.ID }, true);
     public static final UniqueKey<StudentsRecord> STUDENTS_PKEY = Internal.createUniqueKey(Students.STUDENTS, DSL.name("students_pkey"), new TableField[] { Students.STUDENTS.ID }, true);
     public static final UniqueKey<TutorsRecord> TUTORS_PKEY = Internal.createUniqueKey(Tutors.TUTORS, DSL.name("tutors_pkey"), new TableField[] { Tutors.TUTORS.ID }, true);
     public static final UniqueKey<UsersRecord> USERS_EMAIL_KEY = Internal.createUniqueKey(Users.USERS, DSL.name("users_email_key"), new TableField[] { Users.USERS.EMAIL }, true);
