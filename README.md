@@ -18,3 +18,18 @@ Credentials -
 ### NOTE -
 A lot of NPE CHECKS are not being done because the APIs should be fast!
 (Planning to fix it once we have caching enabled)
+
+### Deployment -
+The backend is deployed using [railway](https://railway.app/dashboard)
+
+#### NEW ENVIRONMENTS - 
+
+- production - `https://online-tutoring-backend.up.railway.app`
+- dev - `https://online-tutoring-backend-dev.up.railway.app`
+- localhost - `http://localhost:8080`
+
+
+> DO NOT PUSH TO PRODUCTION WITHOUT A PULL REQUEST
+
+
+If you want to test stuff, push to the `dev` branch which is deployed at `https://online-tutoring-backend-dev.up.railway.app` + `your_api_endpoint` or use the `postman testing suite`
