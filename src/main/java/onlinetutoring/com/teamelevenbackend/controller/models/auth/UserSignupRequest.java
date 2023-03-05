@@ -1,4 +1,4 @@
-package onlinetutoring.com.teamelevenbackend.api.models.auth;
+package onlinetutoring.com.teamelevenbackend.controller.models.auth;
 
 public class UserSignupRequest extends AbstractAuthModel {
     private String fName;

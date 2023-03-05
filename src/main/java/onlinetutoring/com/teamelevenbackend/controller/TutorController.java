@@ -1,4 +1,4 @@
-package onlinetutoring.com.teamelevenbackend.api;
+package onlinetutoring.com.teamelevenbackend.controller;
 
 import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import onlinetutoring.com.teamelevenbackend.service.TutorService;
@@ -15,7 +15,7 @@ import java.util.List;
 @Controller
 @RestController
 @RequestMapping("/tutors")
-public class TutorApis {
+public class TutorController {
 
     private TutorService tutorService;
     @Autowired

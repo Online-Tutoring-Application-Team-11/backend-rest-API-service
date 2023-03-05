@@ -1,7 +1,7 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.auth.LoginRequest;
-import onlinetutoring.com.teamelevenbackend.api.models.auth.UserSignupRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import org.jasypt.util.password.StrongPasswordEncryptor;

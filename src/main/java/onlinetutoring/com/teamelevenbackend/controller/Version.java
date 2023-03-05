@@ -1,4 +1,4 @@
-package onlinetutoring.com.teamelevenbackend.api;
+package onlinetutoring.com.teamelevenbackend.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

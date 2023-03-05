@@ -1,6 +1,6 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.UpdateStudentRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.UpdateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.StudentUser;

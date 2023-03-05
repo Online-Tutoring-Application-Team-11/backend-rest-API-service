@@ -1,7 +1,7 @@
-package onlinetutoring.com.teamelevenbackend.api;
+package onlinetutoring.com.teamelevenbackend.controller;
 
-import onlinetutoring.com.teamelevenbackend.api.models.auth.LoginRequest;
-import onlinetutoring.com.teamelevenbackend.api.models.auth.UserSignupRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 @RestController
 @RequestMapping("/auth")
-public class AuthApis {
+public class AuthController {
 
     private AuthService authService;
     @Autowired
