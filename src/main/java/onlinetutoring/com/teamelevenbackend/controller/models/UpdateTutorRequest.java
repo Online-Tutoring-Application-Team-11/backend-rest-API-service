@@ -1,10 +1,10 @@
-package onlinetutoring.com.teamelevenbackend.api.models;
+package onlinetutoring.com.teamelevenbackend.controller.models;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-public class UpdateStudentRequest implements Serializable {
+public class UpdateTutorRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private String fName;
@@ -13,8 +13,7 @@ public class UpdateStudentRequest implements Serializable {
     private String password;
     private String profilePic;
     private String aboutMe;
-    private Integer year;
-    private List<Integer> favouriteTutorIds;
+    private List<String> subjects;
 
     public String getfName() {
         return fName;
@@ -40,11 +39,7 @@ public class UpdateStudentRequest implements Serializable {
         return aboutMe;
     }
 
-    public Integer getYear() {
-        return year;
-    }
-
-    public List<Integer> getFavouriteTutorIds() {
-        return favouriteTutorIds;
+    public List<String> getSubjects() {
+        return subjects;
     }
 }

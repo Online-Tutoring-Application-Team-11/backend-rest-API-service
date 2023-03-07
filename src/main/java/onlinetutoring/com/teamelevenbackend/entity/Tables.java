@@ -6,7 +6,6 @@ package onlinetutoring.com.teamelevenbackend.entity;
 
 import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
 import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
-import onlinetutoring.com.teamelevenbackend.entity.tables.Internal;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Students;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Tutors;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Users;
@@ -27,11 +26,6 @@ public class Tables {
      * The table <code>public.available_hours</code>.
      */
     public static final AvailableHours AVAILABLE_HOURS = AvailableHours.AVAILABLE_HOURS;
-
-    /**
-     * The table <code>public.internal</code>.
-     */
-    public static final Internal INTERNAL = Internal.INTERNAL;
 
     /**
      * The table <code>public.students</code>.
