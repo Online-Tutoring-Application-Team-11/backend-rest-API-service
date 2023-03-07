@@ -1,5 +1,5 @@
-package onlinetutoring.com.teamelevenbackend.api;
-import onlinetutoring.com.teamelevenbackend.api.models.UpdateTutorRequest;
+package onlinetutoring.com.teamelevenbackend.controller;
+import onlinetutoring.com.teamelevenbackend.controller.models.UpdateTutorRequest;
 import onlinetutoring.com.teamelevenbackend.service.TutorService;
 import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RestController
 @RequestMapping("/api/tutor")
-public class TutorApis {
+public class TutorController {
 
     @Autowired
     private TutorService tutorService;

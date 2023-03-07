@@ -1,4 +1,4 @@
-package onlinetutoring.com.teamelevenbackend.api.models.auth;
+package onlinetutoring.com.teamelevenbackend.controller.models.auth;
 
 import java.io.Serial;
 import java.io.Serializable;

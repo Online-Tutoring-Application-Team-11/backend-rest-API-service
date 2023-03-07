@@ -1,7 +1,7 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.auth.LoginRequest;
-import onlinetutoring.com.teamelevenbackend.api.models.auth.UserSignupRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -11,26 +11,35 @@ import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.Collections;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 
-@Service
+@Component
 public class AuthService {
 
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
-    @Autowired
     private DSLContext dslContext;
-
     @Autowired
+    public void setDslContext(DSLContext dslContext) {
+        this.dslContext = dslContext;
+    }
+
     private StudentService studentService;
-
     @Autowired
+    public void setStudentService(StudentService studentService) {
+        this.studentService = studentService;
+    }
+
     private TutorService tutorService;
+    @Autowired
+    public void setTutorService(TutorService tutorService) {
+        this.tutorService = tutorService;
+    }
 
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
         if (StringUtils.isEmpty(userSignupRequest.getEmail())

@@ -1,6 +1,6 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.api.models.UpdateStudentRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.UpdateStudentRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.StudentUser;
@@ -11,7 +11,7 @@ import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
@@ -21,18 +21,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Service
+@Component
 public class StudentService {
 
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
-    @Autowired
-    private DSLContext dslContext;
-
-    @Autowired
-    private TutorService tutorService;
-
     private static final List<Integer> YEARS = new ArrayList<>(Arrays.asList(0,1,2,3,4));
+
+    private DSLContext dslContext;
+    @Autowired
+    public void setDslContext(DSLContext dslContext) {
+        this.dslContext = dslContext;
+    }
+
+    private TutorService tutorService;
+    @Autowired
+    public void setTutorService(TutorService tutorService) {
+        this.tutorService = tutorService;
+    }
 
     public ResponseEntity<StudentUser> getStudentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
