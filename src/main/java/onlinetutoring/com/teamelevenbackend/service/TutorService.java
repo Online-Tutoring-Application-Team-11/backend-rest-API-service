@@ -1,23 +1,15 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import io.micrometer.common.util.StringUtils;
-import onlinetutoring.com.teamelevenbackend.api.models.UpdateTutorRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
+import onlinetutoring.com.teamelevenbackend.controller.models.UpdateTutorRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
-import onlinetutoring.com.teamelevenbackend.models.StudentUser;
-import onlinetutoring.com.teamelevenbackend.models.TutorUser;
-import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
+import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -30,15 +22,13 @@ import java.util.List;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
-import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
 
 @Component
 public class TutorService {
 
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
+    private DSLContext dslContext;
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
@@ -78,13 +68,6 @@ public class TutorService {
         return finalTutorList;
     }
 
-    public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
-        try {
-            dslContext.insertInto(TUTORS)
-                    .set(TUTORS.ID, id)
-                    .set(TUTORS.SUBJECTS, subjects.toArray(new String[0]))
-                    .execute();
-            // NOTE: Maximum subjects taught by a tutor is 100
 //    public List<String> availableSubjects(List<String> subjects) {
 //        if (CollectionUtils.isEmpty(subjects)) {
 //            return Collections.emptyList();
@@ -101,7 +84,8 @@ public class TutorService {
 //        return SubjectList;
 //    }
 
-    public boolean insertIntoTutors(int id, List<String> subjects) {
+    public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
+        try {
         dslContext.insertInto(TUTORS)
                 .set(TUTORS.ID, id)
                 .set(TUTORS.SUBJECTS, subjects.toArray(new String[0]))
@@ -117,31 +101,11 @@ public class TutorService {
         }
     }
 
-    private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord) {
-        TutorUser response = new TutorUser();
-
-        // user data
-        response.setId(usersRecord.getId());
-        response.setFName(usersRecord.getFName());
-        response.setLName(usersRecord.getLName());
-        response.setEmail(usersRecord.getEmail());
-        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
-        response.setPassword(null);
-        response.setTotalHours(usersRecord.getTotalHours());
-        response.setTutor(true);
-        response.setProfilePic(usersRecord.getProfilePic());
-        response.setAboutMe(usersRecord.getAboutMe());
-
-        // tutor data
-        response.setSubjects(Arrays.asList(tutorsRecord.getSubjects()));
-
-        return response;
-    }
-
     public ResponseEntity<TutorUser> getTutorByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         try {
             Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
             if (userData.isEmpty()) {
@@ -155,7 +119,6 @@ public class TutorService {
             }
 
             return new ResponseEntity<>(this.buildTutorUser(usersRecord, tutorData.get(0)), HttpStatus.OK);
-
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
         }
@@ -200,6 +163,7 @@ public class TutorService {
             throw new SQLException("Could not update Tutor", ex);
         }
     }
+
     public ResponseEntity<HttpStatus> deleteTutor(String email) throws SQLException {
         if (org.jooq.tools.StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -229,6 +193,7 @@ public class TutorService {
             throw new SQLException("Failed to delete Tutor", ex);
         }
     }
+
     private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord) {
         TutorUser response = new TutorUser();
 
@@ -245,8 +210,8 @@ public class TutorService {
         response.setProfilePic(usersRecord.getProfilePic());
         response.setAboutMe(usersRecord.getAboutMe());
 
-        // tutor data, do I need to check if the subjects
-       // response.setSubjects(tutorService.availableSubjects(Arrays.asList(tutorsRecord.getSubjects())));
+        // tutor data
+        response.setSubjects(Arrays.asList(tutorsRecord.getSubjects()));
 
         return response;
     }
