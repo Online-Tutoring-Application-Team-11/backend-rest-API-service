@@ -5,6 +5,7 @@ Backend Rest API Service Powered by Java and Spring for the Online Tutoring Appl
 1. Download Java version 17
 2. [Download intellij IDEA](https://www.jetbrains.com/idea/download/#section=windows)
 3. `mvn clean install` [This is a MAVEN PROJECT]
+4. Run the main function present in  `src/main/java/onlinetutoring/com/teamelevenbackend/TeamElevenBackendApplication.java`
 
 ## Database - 
 The Application uses Postgres DB and is hosted on AWS
@@ -14,10 +15,6 @@ Credentials -
 * port: `5432`
 * username: `crud`
 * password: `crudpass`
-
-### NOTE -
-A lot of NPE CHECKS are not being done because the APIs should be fast!
-(Planning to fix it once we have caching enabled)
 
 ### Deployment -
 The backend is deployed using [railway](https://railway.app/dashboard)
@@ -32,4 +29,6 @@ The backend is deployed using [railway](https://railway.app/dashboard)
 > DO NOT PUSH TO PRODUCTION WITHOUT A PULL REQUEST
 
 
-If you want to test stuff, push to the `dev` branch which is deployed at `https://online-tutoring-backend-dev.up.railway.app` + `your_api_endpoint` or use the `postman testing suite`
+#### TESTING -
+* You can push to the `dev` branch which is deployed at `https://online-tutoring-backend-dev.up.railway.app` 
+* You can use the `postman testing suite` with the app running locally
