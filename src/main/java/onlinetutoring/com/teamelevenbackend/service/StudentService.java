@@ -86,36 +86,6 @@ public class StudentService {
         }
     }
 
-    public ResponseEntity<HttpStatus> deleteStudent(String email) throws SQLException {
-        if (StringUtils.isEmpty(email)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            // check if exists
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
-
-            dslContext.deleteFrom(STUDENTS).where(STUDENTS.ID.eq(usersRecord.getId())).execute();
-
-            dslContext.deleteFrom(USERS).where(USERS.ID.eq(usersRecord.getId())).execute();
-
-            userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-
-            // deletion failed
-            if (userData.isNotEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception ex) {
-            throw new SQLException("Failed to delete Student", ex);
-        }
-    }
-
     public ResponseEntity<StudentUser> updateStudent(UpdateStudentRequest updateStudentRequest) throws SQLException {
         if (StringUtils.isEmpty(updateStudentRequest.getEmail()) || this.isInvalidYear(updateStudentRequest.getYear())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

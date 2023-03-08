@@ -164,36 +164,6 @@ public class TutorService {
         }
     }
 
-    public ResponseEntity<HttpStatus> deleteTutor(String email) throws SQLException {
-        if (org.jooq.tools.StringUtils.isEmpty(email)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            // check if exists
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
-
-            dslContext.deleteFrom(TUTORS).where(TUTORS.ID.eq(usersRecord.getId())).execute();
-
-            dslContext.deleteFrom(USERS).where(USERS.ID.eq(usersRecord.getId())).execute();
-
-            userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-
-            // deletion failed
-            if (userData.isNotEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception ex) {
-            throw new SQLException("Failed to delete Tutor", ex);
-        }
-    }
-
     private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord) {
         TutorUser response = new TutorUser();
 
