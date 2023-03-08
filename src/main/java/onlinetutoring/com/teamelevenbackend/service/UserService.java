@@ -7,12 +7,14 @@ import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.*;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
 
+@Controller
 public class UserService {
     private DSLContext dslContext;
     @Autowired
