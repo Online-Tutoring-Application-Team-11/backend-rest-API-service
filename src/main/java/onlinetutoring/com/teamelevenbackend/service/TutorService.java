@@ -206,7 +206,7 @@ public class TutorService {
         // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
         response.setPassword(null);
         response.setTotalHours(usersRecord.getTotalHours()); // Can we use this as available hours for tutors
-        response.setTutor(false);
+        response.setTutor(true);
         response.setProfilePic(usersRecord.getProfilePic());
         response.setAboutMe(usersRecord.getAboutMe());
 
