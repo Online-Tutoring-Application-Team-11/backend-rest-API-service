@@ -26,5 +26,4 @@ public class UpdateProfileRequest extends AbstractUpdateRequest {
     public String getPassword() {
         return password;
     }
-
 }

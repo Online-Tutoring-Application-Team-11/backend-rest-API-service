@@ -63,7 +63,9 @@ public class UserService {
     }
 
     public ResponseEntity<Users> updateProfile(UpdateProfileRequest updateProfileRequest) throws SQLException {
-        if (StringUtils.isEmpty(updateProfileRequest.getEmail()) || StringUtils.isEmpty(updateProfileRequest.getPassword())) {
+        if (StringUtils.isEmpty(updateProfileRequest.getEmail())
+                || StringUtils.isEmpty(updateProfileRequest.getPassword())
+                || StringUtils.isEmpty(updateProfileRequest.getfName())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
