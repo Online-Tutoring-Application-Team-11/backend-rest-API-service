@@ -4,7 +4,6 @@ import onlinetutoring.com.teamelevenbackend.controller.models.UpdateStudentReque
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.StudentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.StudentUser;
-import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -23,9 +22,6 @@ import java.util.List;
 
 @Component
 public class StudentService {
-
-    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
-
     private static final List<Integer> YEARS = new ArrayList<>(Arrays.asList(0,1,2,3,4));
 
     private DSLContext dslContext;
@@ -92,35 +88,25 @@ public class StudentService {
         }
 
         try {
-            Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(updateStudentRequest.getEmail()));
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateStudentRequest.getEmail()));
 
             // user does not exists
-            if (resUserBefore.isEmpty()) {
+            if (resUser.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            // update user
-            dslContext.update(USERS)
-                    .set(USERS.F_NAME, updateStudentRequest.getfName())
-                    .set(USERS.L_NAME, updateStudentRequest.getlName())
-                    .set(USERS.PROFILE_PIC, updateStudentRequest.getProfilePic())
-                    .set(USERS.ABOUT_ME, updateStudentRequest.getAboutMe())
-                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(updateStudentRequest.getPassword()))
-                    .where(USERS.EMAIL.eq(updateStudentRequest.getEmail()))
-                    .execute();
-
-            UsersRecord resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateStudentRequest.getEmail())).get(0);
+            UsersRecord user = resUser.get(0);
 
             // update students
             dslContext.update(STUDENTS)
                     .set(STUDENTS.FAVOURITE_TUTOR_IDS, updateStudentRequest.getFavouriteTutorIds().toArray(new Integer[0]))
                     .set(STUDENTS.YEAR, updateStudentRequest.getYear())
-                    .where(STUDENTS.ID.eq(resUser.getId()))
+                    .where(STUDENTS.ID.eq(user.getId()))
                     .execute();
 
-            StudentsRecord resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(resUser.getId())).get(0);
+            StudentsRecord resStudent = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(user.getId())).get(0);
 
-            return new ResponseEntity<>(this.buildStudentUser(resUser, resStudent), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildStudentUser(user, resStudent), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update student", ex);
         }

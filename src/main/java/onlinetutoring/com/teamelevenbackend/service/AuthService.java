@@ -1,5 +1,6 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
@@ -39,6 +40,12 @@ public class AuthService {
     @Autowired
     public void setTutorService(TutorService tutorService) {
         this.tutorService = tutorService;
+    }
+
+    private UserService userService;
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
@@ -85,7 +92,7 @@ public class AuthService {
                 }
             }
 
-            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Signup Failure", ex);
         }
@@ -110,26 +117,39 @@ public class AuthService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Login Failure", ex);
         }
     }
 
-    private Users buildUser(UsersRecord usersRecord) {
-        Users response = new Users();
+    public ResponseEntity<HttpStatus> updatePassword(ChangePasswordRequest changePasswordRequest) throws SQLException {
+        if (StringUtils.isEmpty(changePasswordRequest.getEmail())
+                || StringUtils.isEmpty(changePasswordRequest.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
-        response.setId(usersRecord.getId());
-        response.setFName(usersRecord.getFName());
-        response.setLName(usersRecord.getLName());
-        response.setEmail(usersRecord.getEmail());
-        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
-        response.setPassword(null);
-        response.setTotalHours(usersRecord.getTotalHours());
-        response.setTutor(usersRecord.getTutor());
-        response.setProfilePic(usersRecord.getProfilePic());
-        response.setAboutMe(usersRecord.getAboutMe());
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(changePasswordRequest.getEmail()));
 
-        return response;
+            // user does not exist
+            if (resUser.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            UsersRecord user = resUser.get(0);
+
+            if (Boolean.FALSE.equals(PASSWORD_ENCRYPTOR.checkPassword(changePasswordRequest.getPassword(), user.getPassword()))) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            dslContext.update(USERS)
+                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(changePasswordRequest.getNewPassword()))
+                    .where(USERS.EMAIL.eq(changePasswordRequest.getEmail()))
+                    .execute();
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Update password failed", ex);
+        }
     }
 }

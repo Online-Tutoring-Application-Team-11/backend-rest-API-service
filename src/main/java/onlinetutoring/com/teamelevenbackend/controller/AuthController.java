@@ -1,5 +1,6 @@
 package onlinetutoring.com.teamelevenbackend.controller;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +40,15 @@ public class AuthController {
     public ResponseEntity<Users> login(@RequestBody LoginRequest loginRequest) {
         try {
             return authService.login(loginRequest);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "/change-password")
+    public ResponseEntity<HttpStatus> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        try {
+            return authService.updatePassword(changePasswordRequest);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

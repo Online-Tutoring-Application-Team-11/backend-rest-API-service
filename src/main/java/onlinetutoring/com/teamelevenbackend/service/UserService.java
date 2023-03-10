@@ -1,6 +1,9 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.UpdateProfileRequest;
+import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -11,11 +14,14 @@ import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
 
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.*;
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
 
 @Controller
 public class UserService {
+    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
+
     private DSLContext dslContext;
     @Autowired
     public void setDslContext(DSLContext dslContext) {
@@ -36,7 +42,7 @@ public class UserService {
 
             UsersRecord usersRecord = userData.get(0);
 
-            if (usersRecord.getTutor()) {
+            if (Boolean.TRUE.equals(usersRecord.getTutor())) {
                 dslContext.deleteFrom(TUTORS).where(TUTORS.ID.eq(usersRecord.getId())).execute();
             } else {
                 dslContext.deleteFrom(STUDENTS).where(STUDENTS.ID.eq(usersRecord.getId())).execute();
@@ -54,5 +60,58 @@ public class UserService {
         } catch (Exception ex) {
             throw new SQLException("Failed to delete User", ex);
         }
+    }
+
+    public ResponseEntity<Users> updateProfile(UpdateProfileRequest updateProfileRequest) throws SQLException {
+        if (StringUtils.isEmpty(updateProfileRequest.getEmail()) || StringUtils.isEmpty(updateProfileRequest.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateProfileRequest.getEmail()));
+
+            // user does not exists
+            if (resUser.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // if user password does not match
+            if (Boolean.FALSE.equals(PASSWORD_ENCRYPTOR.checkPassword(updateProfileRequest.getPassword(), resUser.get(0).getPassword()))) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // update user
+            dslContext.update(USERS)
+                    .set(USERS.F_NAME, updateProfileRequest.getfName())
+                    .set(USERS.L_NAME, updateProfileRequest.getlName())
+                    .set(USERS.PROFILE_PIC, updateProfileRequest.getProfilePic())
+                    .set(USERS.ABOUT_ME, updateProfileRequest.getAboutMe())
+                    .where(USERS.EMAIL.eq(updateProfileRequest.getEmail()))
+                    .execute();
+
+            UsersRecord user = dslContext.fetch(USERS, USERS.EMAIL.eq(updateProfileRequest.getEmail())).get(0);
+
+            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Could not update user", ex);
+        }
+    }
+
+    public Users buildUser(UsersRecord usersRecord) {
+        Users response = new Users();
+
+        // user data
+        response.setId(usersRecord.getId());
+        response.setFName(usersRecord.getFName());
+        response.setLName(usersRecord.getLName());
+        response.setEmail(usersRecord.getEmail());
+        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
+        response.setPassword(null);
+        response.setTotalHours(usersRecord.getTotalHours());
+        response.setTutor(usersRecord.getTutor());
+        response.setProfilePic(usersRecord.getProfilePic());
+        response.setAboutMe(usersRecord.getAboutMe());
+
+        return response;
     }
 }
