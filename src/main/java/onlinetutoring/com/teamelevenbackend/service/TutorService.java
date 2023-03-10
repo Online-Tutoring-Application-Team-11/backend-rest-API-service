@@ -5,7 +5,6 @@ import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import org.apache.commons.collections4.CollectionUtils;
-import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -25,9 +24,6 @@ import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 
 @Component
 public class TutorService {
-
-    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
-
     private DSLContext dslContext;
     @Autowired
     public void setDslContext(DSLContext dslContext) {
@@ -130,35 +126,24 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(updateTutorRequest.getEmail()));
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateTutorRequest.getEmail()));
 
             // user does not exists
-            if (resUserBefore.isEmpty()) {
+            if (resUser.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            // update user
-            dslContext.update(USERS)
-                    .set(USERS.F_NAME, updateTutorRequest.getfName())
-                    .set(USERS.L_NAME, updateTutorRequest.getlName())
-                    .set(USERS.PROFILE_PIC, updateTutorRequest.getProfilePic())
-                    .set(USERS.ABOUT_ME, updateTutorRequest.getAboutMe())
-                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(updateTutorRequest.getPassword()))
-                    .where(USERS.EMAIL.eq(updateTutorRequest.getEmail()))
-                    .execute();
-
-            UsersRecord resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateTutorRequest.getEmail())).get(0);
+            UsersRecord user = resUser.get(0);
 
             // update tutors
             dslContext.update(TUTORS)
                     .set(TUTORS.SUBJECTS, updateTutorRequest.getSubjects().toArray(new String[0]))
-                    .where(TUTORS.ID.eq(resUser.getId()))
+                    .where(TUTORS.ID.eq(user.getId()))
                     .execute();
 
-            TutorsRecord resTutor = dslContext.fetch(TUTORS, TUTORS.ID.eq(resUser.getId())).get(0);
+            TutorsRecord resTutor = dslContext.fetch(TUTORS, TUTORS.ID.eq(user.getId())).get(0);
 
-
-            return new ResponseEntity<>(this.buildTutorUser(resUser, resTutor), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildTutorUser(user, resTutor), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update Tutor", ex);
         }

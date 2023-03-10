@@ -3,7 +3,6 @@ package onlinetutoring.com.teamelevenbackend.controller.models;
 import java.util.List;
 
 public class UpdateStudentRequest extends AbstractUpdateRequest {
-
     private Integer year;
     private List<Integer> favouriteTutorIds;
 
