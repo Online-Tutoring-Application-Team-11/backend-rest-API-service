@@ -55,20 +55,11 @@ public class AuthService {
     }
 
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
-//        if (StringUtils.isEmpty(userSignupRequest.getEmail())
-//                || StringUtils.isEmpty(userSignupRequest.getPassword())
-//                || StringUtils.isEmpty(userSignupRequest.getfName())) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-
-        // Validate email
-        if (!IsEmailValid(userSignupRequest.getEmail())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        // Check for empty fields
-        if (StringUtils.isEmpty(userSignupRequest.getPassword())
-                || StringUtils.isEmpty(userSignupRequest.getfName())) {
+        // Check for empty fields and validated email
+        if (StringUtils.isEmpty(userSignupRequest.getEmail())
+                || StringUtils.isEmpty(userSignupRequest.getPassword())
+                || StringUtils.isEmpty(userSignupRequest.getfName())
+                || !IsEmailValid(userSignupRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -171,7 +162,8 @@ public class AuthService {
         }
     }
 
-    public boolean IsEmailValid(String email) {
+
+    private boolean IsEmailValid(String email) {
 
         String regex = "^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         Pattern pattern = Pattern.compile(regex);
@@ -180,4 +172,5 @@ public class AuthService {
         return matcher.matches();
     }
 }
+
 
