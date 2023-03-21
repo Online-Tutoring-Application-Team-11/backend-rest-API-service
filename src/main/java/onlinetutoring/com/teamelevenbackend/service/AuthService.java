@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 
@@ -25,35 +27,42 @@ public class AuthService {
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
     private DSLContext dslContext;
+
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
 
     private StudentService studentService;
+
     @Autowired
     public void setStudentService(StudentService studentService) {
         this.studentService = studentService;
     }
 
     private TutorService tutorService;
+
     @Autowired
     public void setTutorService(TutorService tutorService) {
         this.tutorService = tutorService;
     }
 
     private UserService userService;
+
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
+        // Check for empty fields and validated email
         if (StringUtils.isEmpty(userSignupRequest.getEmail())
                 || StringUtils.isEmpty(userSignupRequest.getPassword())
-                || StringUtils.isEmpty(userSignupRequest.getfName())) {
+                || StringUtils.isEmpty(userSignupRequest.getfName())
+                || !IsEmailValid(userSignupRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
 
         try {
             Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
@@ -152,4 +161,16 @@ public class AuthService {
             throw new SQLException("Update password failed", ex);
         }
     }
+
+
+    private boolean IsEmailValid(String email) {
+
+        String regex = "^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 }
+
+
