@@ -55,11 +55,23 @@ public class AuthService {
     }
 
     public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
-        if (StringUtils.isEmpty(userSignupRequest.getEmail())
-                || StringUtils.isEmpty(userSignupRequest.getPassword())
+//        if (StringUtils.isEmpty(userSignupRequest.getEmail())
+//                || StringUtils.isEmpty(userSignupRequest.getPassword())
+//                || StringUtils.isEmpty(userSignupRequest.getfName())) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+
+        // Validate email
+        if (!IsEmailValid(userSignupRequest.getEmail())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        // Check for empty fields
+        if (StringUtils.isEmpty(userSignupRequest.getPassword())
                 || StringUtils.isEmpty(userSignupRequest.getfName())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
 
         try {
             Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
