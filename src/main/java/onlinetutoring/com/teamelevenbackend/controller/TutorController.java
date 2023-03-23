@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,9 +29,9 @@ public class TutorController {
     }
 
     @GetMapping(value = "/get/all")
-    public ResponseEntity<List<TutorUser>> getTutors() {
+    public ResponseEntity<List<TutorUser>> getTutors(@RequestParam(required = false) String subject) {
         try {
-            return tutorService.getAllTutors();
+            return tutorService.getAllTutors(subject);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
