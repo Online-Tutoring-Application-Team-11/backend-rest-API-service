@@ -30,10 +30,16 @@ public class TutorService {
         this.dslContext = dslContext;
     }
 
-    public ResponseEntity<List<TutorUser>> getAllTutors() throws SQLException {
+    public ResponseEntity<List<TutorUser>> getAllTutors(String subject) throws SQLException {
         try {
-            // fetching all tutors
-            Result<TutorsRecord> allTutors = dslContext.fetch(TUTORS, TUTORS.ID.ge(0));
+            Result<TutorsRecord> allTutors;
+            if (StringUtils.isEmpty(subject)) {
+                // fetching all tutors
+                allTutors = dslContext.fetch(TUTORS, TUTORS.ID.ge(0));
+            } else {
+                // fetching all tutors by a subject
+                allTutors = dslContext.fetch(TUTORS, TUTORS.SUBJECTS.contains((new String[] {subject})));
+            }
 
             List<TutorUser> response = new ArrayList<>();
 
@@ -63,22 +69,6 @@ public class TutorService {
 
         return finalTutorList;
     }
-
-//    public List<String> availableSubjects(List<String> subjects) {
-//        if (CollectionUtils.isEmpty(subjects)) {
-//            return Collections.emptyList();
-//        }
-//
-//        List<String> SubjectList = new ArrayList<>();
-//        for (String subject : subjects) {
-//            Result<TutorsRecord> tutorData = dslContext.fetch(TUTORS, TUTORS.SUBJECTS.eq(subject));
-//            if (tutorData.isNotEmpty()) {
-//                SubjectList.add(tutorData.get(0).getSubjects());
-//            }
-//        }
-//
-//        return SubjectList;
-//    }
 
     public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
         try {

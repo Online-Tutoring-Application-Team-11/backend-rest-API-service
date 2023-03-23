@@ -10,7 +10,7 @@
     </parent>
     <groupId>online-tutoring.com.example</groupId>
     <artifactId>team-eleven-backend</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
     <name>team-eleven-backend</name>
     <description>Backend Service for the Online Tutoring Application</description>
