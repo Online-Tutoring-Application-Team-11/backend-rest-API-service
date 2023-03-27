@@ -1,10 +1,11 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.UsersWithTokenResponse;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
+import onlinetutoring.com.teamelevenbackend.util.JwtUtil;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -27,34 +28,36 @@ public class AuthService {
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
     private DSLContext dslContext;
-
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
 
     private StudentService studentService;
-
     @Autowired
     public void setStudentService(StudentService studentService) {
         this.studentService = studentService;
     }
 
     private TutorService tutorService;
-
     @Autowired
     public void setTutorService(TutorService tutorService) {
         this.tutorService = tutorService;
     }
 
-    private UserService userService;
+    private JwtUtil jwtUtil;
+    @Autowired
+    public void setJwtUtil(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
+    private UserService userService;
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
-    public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
+    public ResponseEntity<UsersWithTokenResponse> signup(UserSignupRequest userSignupRequest) throws SQLException {
         // Check for empty fields and validated email
         if (StringUtils.isEmpty(userSignupRequest.getEmail())
                 || StringUtils.isEmpty(userSignupRequest.getPassword())
@@ -101,13 +104,13 @@ public class AuthService {
                 }
             }
 
-            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(new UsersWithTokenResponse(userService.buildUser(user), jwtUtil.generateToken(userSignupRequest.getEmail())), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Signup Failure", ex);
         }
     }
 
-    public ResponseEntity<Users> login(LoginRequest loginRequest) throws SQLException {
+    public ResponseEntity<UsersWithTokenResponse> login(LoginRequest loginRequest) throws SQLException {
         if (StringUtils.isEmpty(loginRequest.getEmail())
                 || StringUtils.isEmpty(loginRequest.getPassword())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -126,7 +129,7 @@ public class AuthService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(new UsersWithTokenResponse(userService.buildUser(user), jwtUtil.generateToken(loginRequest.getEmail())), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Login Failure", ex);
         }

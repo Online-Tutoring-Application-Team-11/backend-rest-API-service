@@ -1,9 +1,9 @@
 package onlinetutoring.com.teamelevenbackend.controller;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.UsersWithTokenResponse;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<Users> signup(@RequestBody UserSignupRequest userSignupRequest) {
+    public ResponseEntity<UsersWithTokenResponse> signup(@RequestBody UserSignupRequest userSignupRequest) {
         try {
             return authService.signup(userSignupRequest);
         } catch (Exception ex) {
@@ -39,7 +39,7 @@ public class AuthController {
     }
 
     @GetMapping(value = "/login")
-    public ResponseEntity<Users> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UsersWithTokenResponse> login(@RequestBody LoginRequest loginRequest) {
         try {
             return authService.login(loginRequest);
         } catch (Exception ex) {
