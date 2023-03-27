@@ -26,6 +26,7 @@ import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
@@ -76,7 +77,7 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     /**
      * The column <code>public.appointments.subject</code>.
      */
-    public final TableField<AppointmentsRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(100), this, "");
+    public final TableField<AppointmentsRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     private Appointments(Name alias, Table<AppointmentsRecord> aliased) {
         this(alias, aliased, null);
@@ -114,6 +115,11 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public UniqueKey<AppointmentsRecord> getPrimaryKey() {
+        return Keys.APPOINTMENTS_PKEY;
     }
 
     @Override
