@@ -4,7 +4,7 @@
 package onlinetutoring.com.teamelevenbackend.entity.tables;
 
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -66,12 +66,12 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     /**
      * The column <code>public.appointments.start_time</code>.
      */
-    public final TableField<AppointmentsRecord, OffsetDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false), this, "");
+    public final TableField<AppointmentsRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.appointments.end_time</code>.
      */
-    public final TableField<AppointmentsRecord, OffsetDateTime> END_TIME = createField(DSL.name("end_time"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false), this, "");
+    public final TableField<AppointmentsRecord, LocalDateTime> END_TIME = createField(DSL.name("end_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.appointments.subject</code>.
@@ -195,14 +195,14 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Integer, Integer, OffsetDateTime, OffsetDateTime, String> fieldsRow() {
+    public Row5<Integer, Integer, LocalDateTime, LocalDateTime, String> fieldsRow() {
         return (Row5) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function5<? super Integer, ? super Integer, ? super OffsetDateTime, ? super OffsetDateTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function5<? super Integer, ? super Integer, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -210,7 +210,7 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super Integer, ? super Integer, ? super OffsetDateTime, ? super OffsetDateTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super Integer, ? super Integer, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

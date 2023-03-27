@@ -5,7 +5,7 @@ package onlinetutoring.com.teamelevenbackend.entity.tables.pojos;
 
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 
 /**
@@ -18,8 +18,8 @@ public class Appointments implements Serializable {
 
     private Integer tutorId;
     private Integer studentId;
-    private OffsetDateTime startTime;
-    private OffsetDateTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String subject;
 
     public Appointments() {}
@@ -35,8 +35,8 @@ public class Appointments implements Serializable {
     public Appointments(
         Integer tutorId,
         Integer studentId,
-        OffsetDateTime startTime,
-        OffsetDateTime endTime,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
         String subject
     ) {
         this.tutorId = tutorId;
@@ -79,14 +79,14 @@ public class Appointments implements Serializable {
     /**
      * Getter for <code>public.appointments.start_time</code>.
      */
-    public OffsetDateTime getStartTime() {
+    public LocalDateTime getStartTime() {
         return this.startTime;
     }
 
     /**
      * Setter for <code>public.appointments.start_time</code>.
      */
-    public Appointments setStartTime(OffsetDateTime startTime) {
+    public Appointments setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
         return this;
     }
@@ -94,14 +94,14 @@ public class Appointments implements Serializable {
     /**
      * Getter for <code>public.appointments.end_time</code>.
      */
-    public OffsetDateTime getEndTime() {
+    public LocalDateTime getEndTime() {
         return this.endTime;
     }
 
     /**
      * Setter for <code>public.appointments.end_time</code>.
      */
-    public Appointments setEndTime(OffsetDateTime endTime) {
+    public Appointments setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
         return this;
     }
