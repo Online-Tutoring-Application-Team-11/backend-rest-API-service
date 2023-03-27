@@ -10,7 +10,7 @@
     </parent>
     <groupId>online-tutoring.com.example</groupId>
     <artifactId>team-eleven-backend</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.6</version>
     <packaging>jar</packaging>
     <name>team-eleven-backend</name>
     <description>Backend Service for the Online Tutoring Application</description>
@@ -34,6 +34,12 @@
             <artifactId>spring-boot-starter-jooq</artifactId>
             <version>${spring-boot-version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot-version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!--  OTHER  -->
         <dependency>
@@ -50,14 +56,6 @@
             <groupId>org.jasypt</groupId>
             <artifactId>jasypt</artifactId>
             <version>1.9.3</version>
-        </dependency>
-
-        <!--  TESTING  -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring-boot-version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
