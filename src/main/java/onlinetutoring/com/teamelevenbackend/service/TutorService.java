@@ -1,9 +1,13 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
+import onlinetutoring.com.teamelevenbackend.controller.models.ModifyAvailableHours;
 import onlinetutoring.com.teamelevenbackend.controller.models.UpdateTutorRequest;
+import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.AvailableHours;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AvailableHoursRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import onlinetutoring.com.teamelevenbackend.models.TutorUser;
+import onlinetutoring.com.teamelevenbackend.models.enums.Days;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -19,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.AVAILABLE_HOURS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 
@@ -30,10 +35,16 @@ public class TutorService {
         this.dslContext = dslContext;
     }
 
-    public ResponseEntity<List<TutorUser>> getAllTutors() throws SQLException {
+    public ResponseEntity<List<TutorUser>> getAllTutors(String subject) throws SQLException {
         try {
-            // fetching all tutors
-            Result<TutorsRecord> allTutors = dslContext.fetch(TUTORS, TUTORS.ID.ge(0));
+            Result<TutorsRecord> allTutors;
+            if (StringUtils.isEmpty(subject)) {
+                // fetching all tutors
+                allTutors = dslContext.fetch(TUTORS, TUTORS.ID.ge(0));
+            } else {
+                // fetching all tutors by a subject
+                allTutors = dslContext.fetch(TUTORS, TUTORS.SUBJECTS.contains((new String[] {subject})));
+            }
 
             List<TutorUser> response = new ArrayList<>();
 
@@ -63,22 +74,6 @@ public class TutorService {
 
         return finalTutorList;
     }
-
-//    public List<String> availableSubjects(List<String> subjects) {
-//        if (CollectionUtils.isEmpty(subjects)) {
-//            return Collections.emptyList();
-//        }
-//
-//        List<String> SubjectList = new ArrayList<>();
-//        for (String subject : subjects) {
-//            Result<TutorsRecord> tutorData = dslContext.fetch(TUTORS, TUTORS.SUBJECTS.eq(subject));
-//            if (tutorData.isNotEmpty()) {
-//                SubjectList.add(tutorData.get(0).getSubjects());
-//            }
-//        }
-//
-//        return SubjectList;
-//    }
 
     public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
         try {
@@ -149,6 +144,100 @@ public class TutorService {
         }
     }
 
+    public ResponseEntity<AvailableHours> modifyAvailableHours(ModifyAvailableHours modifyAvailableHours) throws SQLException {
+        if (StringUtils.isEmpty(modifyAvailableHours.getEmail())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(modifyAvailableHours.getEmail()));
+
+            // user does not exists
+            if (resUser.isEmpty() || !Boolean.TRUE.equals(resUser.get(0).getTutor())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // if start time is after end time
+            if (modifyAvailableHours.getStartTime().isAfter(modifyAvailableHours.getEndTime())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            UsersRecord user = resUser.get(0);
+
+            Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()));
+
+            if (availableHoursRecord.isNotEmpty()) {
+                // update available hours
+                dslContext.update(AVAILABLE_HOURS)
+                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
+                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
+                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
+                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()))
+                        .execute();
+            } else {
+                // insert into table
+                dslContext.insertInto(AVAILABLE_HOURS)
+                        .set(AVAILABLE_HOURS.TUTOR_ID, user.getId())
+                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
+                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
+                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
+                        .execute();
+            }
+
+            AvailableHoursRecord availableHoursFinal = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString())).get(0);
+
+            return new ResponseEntity<>(this.buildAvailableHours(availableHoursFinal), HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Could not update AvailableHours", ex);
+        }
+    }
+
+    public ResponseEntity<HttpStatus> deleteAvailableHours(String email, Days day) throws SQLException {
+        if (StringUtils.isEmpty(email)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
+
+            // user does not exists
+            if (resUser.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // if start time is after end time
+            UsersRecord user = resUser.get(0);
+
+            Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
+
+            // if the day path param is present
+            if (day != null) {
+                availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()));
+            }
+
+            if (availableHoursRecord.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // delete from table
+            if (day == null) {
+                dslContext.deleteFrom(AVAILABLE_HOURS)
+                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .execute();
+            } else {
+                dslContext.deleteFrom(AVAILABLE_HOURS)
+                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()))
+                        .execute();
+            }
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Could not update AvailableHours", ex);
+        }
+    }
+
     private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord) {
         TutorUser response = new TutorUser();
 
@@ -167,6 +256,17 @@ public class TutorService {
 
         // tutor data
         response.setSubjects(Arrays.asList(tutorsRecord.getSubjects()));
+
+        return response;
+    }
+
+    private AvailableHours buildAvailableHours(AvailableHoursRecord availableHoursRecord) {
+        AvailableHours response = new AvailableHours();
+
+        response.setTutorId(availableHoursRecord.getTutorId());
+        response.setStartTime(availableHoursRecord.getStartTime());
+        response.setEndTime(availableHoursRecord.getEndTime());
+        response.setDayOfWeek(availableHoursRecord.getDayOfWeek());
 
         return response;
     }

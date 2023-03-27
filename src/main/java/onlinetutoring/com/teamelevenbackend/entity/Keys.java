@@ -33,6 +33,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<AppointmentsRecord> APPOINTMENTS_PKEY = Internal.createUniqueKey(Appointments.APPOINTMENTS, DSL.name("appointments_pkey"), new TableField[] { Appointments.APPOINTMENTS.TUTOR_ID, Appointments.APPOINTMENTS.STUDENT_ID, Appointments.APPOINTMENTS.SUBJECT }, true);
     public static final UniqueKey<AvailableHoursRecord> AVAILABLE_HOURS_PKEY = Internal.createUniqueKey(AvailableHours.AVAILABLE_HOURS, DSL.name("available_hours_pkey"), new TableField[] { AvailableHours.AVAILABLE_HOURS.TUTOR_ID, AvailableHours.AVAILABLE_HOURS.DAY_OF_WEEK }, true);
     public static final UniqueKey<StudentsRecord> STUDENTS_PKEY = Internal.createUniqueKey(Students.STUDENTS, DSL.name("students_pkey"), new TableField[] { Students.STUDENTS.ID }, true);
     public static final UniqueKey<TutorsRecord> TUTORS_PKEY = Internal.createUniqueKey(Tutors.TUTORS, DSL.name("tutors_pkey"), new TableField[] { Tutors.TUTORS.ID }, true);
