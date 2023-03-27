@@ -4,7 +4,7 @@
 package onlinetutoring.com.teamelevenbackend.entity.tables;
 
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -26,6 +26,7 @@ import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
@@ -66,17 +67,17 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     /**
      * The column <code>public.appointments.start_time</code>.
      */
-    public final TableField<AppointmentsRecord, LocalTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALTIME(6).nullable(false), this, "");
+    public final TableField<AppointmentsRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.appointments.end_time</code>.
      */
-    public final TableField<AppointmentsRecord, LocalTime> END_TIME = createField(DSL.name("end_time"), SQLDataType.LOCALTIME(6).nullable(false), this, "");
+    public final TableField<AppointmentsRecord, LocalDateTime> END_TIME = createField(DSL.name("end_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.appointments.subject</code>.
      */
-    public final TableField<AppointmentsRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(100), this, "");
+    public final TableField<AppointmentsRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     private Appointments(Name alias, Table<AppointmentsRecord> aliased) {
         this(alias, aliased, null);
@@ -114,6 +115,11 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     @Override
     public Schema getSchema() {
         return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public UniqueKey<AppointmentsRecord> getPrimaryKey() {
+        return Keys.APPOINTMENTS_PKEY;
     }
 
     @Override
@@ -195,14 +201,14 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Integer, Integer, LocalTime, LocalTime, String> fieldsRow() {
+    public Row5<Integer, Integer, LocalDateTime, LocalDateTime, String> fieldsRow() {
         return (Row5) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function5<? super Integer, ? super Integer, ? super LocalTime, ? super LocalTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function5<? super Integer, ? super Integer, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -210,7 +216,7 @@ public class Appointments extends TableImpl<AppointmentsRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super Integer, ? super Integer, ? super LocalTime, ? super LocalTime, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function5<? super Integer, ? super Integer, ? super LocalDateTime, ? super LocalDateTime, ? super String, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }
