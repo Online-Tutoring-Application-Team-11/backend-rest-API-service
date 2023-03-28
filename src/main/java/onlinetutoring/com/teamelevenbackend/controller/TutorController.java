@@ -61,8 +61,17 @@ public class TutorController {
         }
     }
 
+    @GetMapping(value = "/get/{email}/available-hours")
+    public ResponseEntity<List<AvailableHours>> getAvailableHours(@PathVariable("email") String email) {
+        try {
+            return tutorService.getAvailableHours(email);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PutMapping(value = "/available-hours/modify")
-    public ResponseEntity<AvailableHours> modifyAvailableHours(@RequestBody ModifyAvailableHours modifyAvailableHours) {
+    public ResponseEntity<List<AvailableHours>> modifyAvailableHours(@RequestBody ModifyAvailableHours modifyAvailableHours) {
         try {
             return tutorService.modifyAvailableHours(modifyAvailableHours);
         } catch (Exception ex) {

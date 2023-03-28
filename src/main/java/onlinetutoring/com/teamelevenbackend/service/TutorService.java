@@ -144,7 +144,39 @@ public class TutorService {
         }
     }
 
-    public ResponseEntity<AvailableHours> modifyAvailableHours(ModifyAvailableHours modifyAvailableHours) throws SQLException {
+    public ResponseEntity<List<AvailableHours>> getAvailableHours(String email) throws SQLException {
+        if (StringUtils.isEmpty(email)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
+
+            // user does not exists
+            if (resUser.isEmpty() || !Boolean.TRUE.equals(resUser.get(0).getTutor())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            UsersRecord user = resUser.get(0);
+            Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
+            if (availableHoursRecord.isEmpty()) {
+                return new ResponseEntity<>(Collections.emptyList(), HttpStatus.ACCEPTED);
+            }
+
+            List<AvailableHours> availableHoursList = new ArrayList<>();
+
+            for (AvailableHoursRecord availableHours: availableHoursRecord) {
+                availableHoursList.add(buildAvailableHours(availableHours));
+            }
+
+            return new ResponseEntity<>(availableHoursList, HttpStatus.OK);
+
+        } catch (Exception ex) {
+            throw new SQLException("Could not get AvailableHours", ex);
+        }
+    }
+
+    public ResponseEntity<List<AvailableHours>> modifyAvailableHours(ModifyAvailableHours modifyAvailableHours) throws SQLException {
         if (StringUtils.isEmpty(modifyAvailableHours.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -185,9 +217,7 @@ public class TutorService {
                         .execute();
             }
 
-            AvailableHoursRecord availableHoursFinal = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString())).get(0);
-
-            return new ResponseEntity<>(this.buildAvailableHours(availableHoursFinal), HttpStatus.OK);
+            return this.getAvailableHours(user.getEmail());
         } catch (Exception ex) {
             throw new SQLException("Could not update AvailableHours", ex);
         }
@@ -234,7 +264,7 @@ public class TutorService {
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
-            throw new SQLException("Could not update AvailableHours", ex);
+            throw new SQLException("Could not delete AvailableHours", ex);
         }
     }
 
