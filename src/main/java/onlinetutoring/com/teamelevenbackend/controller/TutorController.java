@@ -29,7 +29,7 @@ import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BA
 @Controller
 @RestController
 @RequestMapping("/tutors")
-@CrossOrigin(origins = {BASE_LOCAL}, methods = {RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE})
 public class TutorController {
 
     private TutorService tutorService;
