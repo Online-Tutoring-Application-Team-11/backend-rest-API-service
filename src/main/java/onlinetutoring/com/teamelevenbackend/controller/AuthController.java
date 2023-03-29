@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_PRODUCTION;
-import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_LOCAL;
+import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PRODUCTION;
+import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
 
 @Controller
 @RestController

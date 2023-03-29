@@ -27,28 +27,24 @@ public class AuthService {
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
     private DSLContext dslContext;
-
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
 
     private StudentService studentService;
-
     @Autowired
     public void setStudentService(StudentService studentService) {
         this.studentService = studentService;
     }
 
     private TutorService tutorService;
-
     @Autowired
     public void setTutorService(TutorService tutorService) {
         this.tutorService = tutorService;
     }
 
     private UserService userService;
-
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;

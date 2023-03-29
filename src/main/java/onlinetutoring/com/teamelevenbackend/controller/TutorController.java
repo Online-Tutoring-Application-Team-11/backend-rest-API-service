@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_LOCAL;
-import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_PRODUCTION;
+import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
+import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PRODUCTION;
 
 @Controller
 @RestController
