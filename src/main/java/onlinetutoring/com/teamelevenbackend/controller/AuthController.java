@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_PRODUCTION;
+import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_LOCAL;
 
 @Controller
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin
+@CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
 public class AuthController {
 
     private AuthService authService;

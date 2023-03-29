@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_LOCAL;
+import static onlinetutoring.com.teamelevenbackend.controller.ControllerUtils.BASE_PRODUCTION;
 
 @Controller
 @RestController
 @RequestMapping("/users")
-@CrossOrigin
+@CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.DELETE, RequestMethod.PUT})
 public class UserController {
     private UserService userService;
     @Autowired
