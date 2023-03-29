@@ -3,7 +3,6 @@ package onlinetutoring.com.teamelevenbackend.service;
 import onlinetutoring.com.teamelevenbackend.controller.models.UpdateProfileRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
-import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -20,8 +19,6 @@ import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
 
 @Controller
 public class UserService {
-    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
-
     private DSLContext dslContext;
     @Autowired
     public void setDslContext(DSLContext dslContext) {
@@ -64,7 +61,6 @@ public class UserService {
 
     public ResponseEntity<Users> updateProfile(UpdateProfileRequest updateProfileRequest) throws SQLException {
         if (StringUtils.isEmpty(updateProfileRequest.getEmail())
-                || StringUtils.isEmpty(updateProfileRequest.getPassword())
                 || StringUtils.isEmpty(updateProfileRequest.getfName())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -74,11 +70,6 @@ public class UserService {
 
             // user does not exists
             if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            // if user password does not match
-            if (Boolean.FALSE.equals(PASSWORD_ENCRYPTOR.checkPassword(updateProfileRequest.getPassword(), resUser.get(0).getPassword()))) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
