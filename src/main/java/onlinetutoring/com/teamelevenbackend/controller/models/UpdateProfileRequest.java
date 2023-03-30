@@ -5,7 +5,6 @@ public class UpdateProfileRequest extends AbstractUpdateRequest {
     private String lName;
     private String profilePic;
     private String aboutMe;
-    private String password;
 
     public String getfName() {
         return fName;
@@ -21,9 +20,5 @@ public class UpdateProfileRequest extends AbstractUpdateRequest {
 
     public String getAboutMe() {
         return aboutMe;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }
