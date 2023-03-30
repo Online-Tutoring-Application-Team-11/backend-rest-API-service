@@ -200,15 +200,6 @@ public class TutorService {
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()));
 
             if (availableHoursRecord.isNotEmpty()) {
-                // update available hours
-                dslContext.update(AVAILABLE_HOURS)
-                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
-                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
-                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
-                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
-                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()))
-                        .execute();
-            } else {
                 final LocalTime endTime = modifyAvailableHours.getEndTime();
                 final LocalTime startTime = modifyAvailableHours.getStartTime();
 
@@ -229,6 +220,15 @@ public class TutorService {
                     }
                 }
 
+                // update available hours
+                dslContext.update(AVAILABLE_HOURS)
+                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
+                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
+                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
+                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()))
+                        .execute();
+            } else {
                 // insert into table
                 dslContext.insertInto(AVAILABLE_HOURS)
                         .set(AVAILABLE_HOURS.TUTOR_ID, user.getId())
