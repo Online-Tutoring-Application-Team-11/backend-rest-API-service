@@ -1,10 +1,10 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
-import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
+import onlinetutoring.com.teamelevenbackend.config.JwtService;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserWithToken;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -27,38 +27,29 @@ public class AuthService {
     private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
 
     private DSLContext dslContext;
-    @Autowired
-    public void setDslContext(DSLContext dslContext) {
-        this.dslContext = dslContext;
-    }
-
     private StudentService studentService;
+    private TutorService tutorService;
     @Autowired
-    public void setStudentService(StudentService studentService) {
+    public void setInternalAuthService(DSLContext dslContext, TutorService tutorService, StudentService studentService) {
+        this.dslContext = dslContext;
+        this.tutorService = tutorService;
         this.studentService = studentService;
     }
 
-    private TutorService tutorService;
+    private JwtService jwtService;
     @Autowired
-    public void setTutorService(TutorService tutorService) {
-        this.tutorService = tutorService;
+    public void setJwtAuth(JwtService jwtService) {
+        this.jwtService = jwtService;
     }
 
-    private UserService userService;
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    public ResponseEntity<Users> signup(UserSignupRequest userSignupRequest) throws SQLException {
+    public ResponseEntity<UserWithToken> signup(UserSignupRequest userSignupRequest) throws SQLException {
         // Check for empty fields and validated email
         if (StringUtils.isEmpty(userSignupRequest.getEmail())
                 || StringUtils.isEmpty(userSignupRequest.getPassword())
                 || StringUtils.isEmpty(userSignupRequest.getfName())
-                || !IsEmailValid(userSignupRequest.getEmail())) {
+                || !isEmailValid(userSignupRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
 
         try {
             Result<UsersRecord> resUserBefore = dslContext.fetch(USERS, USERS.EMAIL.eq(userSignupRequest.getEmail()));
@@ -97,13 +88,13 @@ public class AuthService {
                 }
             }
 
-            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildUser(user, jwtService.generateToken(userSignupRequest)), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Signup Failure", ex);
         }
     }
 
-    public ResponseEntity<Users> login(LoginRequest loginRequest) throws SQLException {
+    public ResponseEntity<UserWithToken> login(LoginRequest loginRequest) throws SQLException {
         if (StringUtils.isEmpty(loginRequest.getEmail())
                 || StringUtils.isEmpty(loginRequest.getPassword())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -122,50 +113,38 @@ public class AuthService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            return new ResponseEntity<>(userService.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildUser(user, jwtService.generateToken(loginRequest)), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Login Failure", ex);
         }
     }
 
-    public ResponseEntity<HttpStatus> updatePassword(ChangePasswordRequest changePasswordRequest) throws SQLException {
-        if (StringUtils.isEmpty(changePasswordRequest.getEmail())
-                || StringUtils.isEmpty(changePasswordRequest.getPassword())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(changePasswordRequest.getEmail()));
-
-            // user does not exist
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            UsersRecord user = resUser.get(0);
-
-            if (Boolean.FALSE.equals(PASSWORD_ENCRYPTOR.checkPassword(changePasswordRequest.getPassword(), user.getPassword()))) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            dslContext.update(USERS)
-                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(changePasswordRequest.getNewPassword()))
-                    .where(USERS.EMAIL.eq(changePasswordRequest.getEmail()))
-                    .execute();
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception ex) {
-            throw new SQLException("Update password failed", ex);
-        }
-    }
-
-
-    private boolean IsEmailValid(String email) {
+    private boolean isEmailValid(String email) {
 
         String regex = "^[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&amp;'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         Pattern pattern = Pattern.compile(regex);
 
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    public UserWithToken buildUser(UsersRecord usersRecord, String token) {
+        UserWithToken response = new UserWithToken();
+
+        // user data
+        response.setId(usersRecord.getId());
+        response.setFName(usersRecord.getFName());
+        response.setLName(usersRecord.getLName());
+        response.setEmail(usersRecord.getEmail());
+        // PASSWORD SET AS NULL (SHOULD NOT BE A PART OF THE RESPONSE)
+        response.setPassword(null);
+        response.setTotalHours(usersRecord.getTotalHours());
+        response.setTutor(usersRecord.getTutor());
+        response.setProfilePic(usersRecord.getProfilePic());
+        response.setAboutMe(usersRecord.getAboutMe());
+        response.setToken(token);
+
+        return response;
     }
 }
 

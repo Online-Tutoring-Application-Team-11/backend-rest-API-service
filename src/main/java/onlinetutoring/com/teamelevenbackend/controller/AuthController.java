@@ -1,16 +1,14 @@
 package onlinetutoring.com.teamelevenbackend.controller;
 
-import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.LoginRequest;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserSignupRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.UserWithToken;
 import onlinetutoring.com.teamelevenbackend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +21,7 @@ import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LO
 @Controller
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.POST, RequestMethod.PUT})
+@CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.POST})
 public class AuthController {
 
     private AuthService authService;
@@ -33,7 +31,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<Users> signup(@RequestBody UserSignupRequest userSignupRequest) {
+    public ResponseEntity<UserWithToken> signup(@RequestBody UserSignupRequest userSignupRequest) {
         try {
             return authService.signup(userSignupRequest);
         } catch (Exception ex) {
@@ -42,18 +40,9 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Users> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UserWithToken> login(@RequestBody LoginRequest loginRequest) {
         try {
             return authService.login(loginRequest);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PutMapping(value = "/change-password")
-    public ResponseEntity<HttpStatus> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-        try {
-            return authService.updatePassword(changePasswordRequest);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
