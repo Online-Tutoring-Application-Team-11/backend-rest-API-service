@@ -22,6 +22,7 @@ import java.util.List;
 
 @Component
 public class StudentService {
+
     private static final List<Integer> YEARS = new ArrayList<>(Arrays.asList(0,1,2,3,4));
 
     private DSLContext dslContext;

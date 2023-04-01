@@ -25,6 +25,7 @@ import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PR
 @RequestMapping("/users")
 @CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.DELETE, RequestMethod.PUT})
 public class UserController {
+
     private UserService userService;
     @Autowired
     public void setUserService(UserService userService) {
