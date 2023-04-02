@@ -53,7 +53,7 @@ public class JwtService {
     }
 
     public boolean isFromRequester(HttpServletRequest request, String userEmail) {
-        return userEmail.equalsIgnoreCase(request.getHeader("user"));
+        return userEmail.equalsIgnoreCase(request.getHeader("User"));
     }
 
     private boolean isTokenExpired(String token) {
