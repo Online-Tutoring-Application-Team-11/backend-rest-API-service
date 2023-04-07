@@ -1,8 +1,11 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
 import onlinetutoring.com.teamelevenbackend.controller.models.UpdateProfileRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.AbstractAuthModel;
+import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
@@ -19,10 +23,22 @@ import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
 
 @Controller
 public class UserService {
+
+    private static final StrongPasswordEncryptor PASSWORD_ENCRYPTOR = new StrongPasswordEncryptor();
+
     private DSLContext dslContext;
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
+    }
+
+    public Optional<AbstractAuthModel> findByEmail(String email) {
+        Result<UsersRecord> result = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new AbstractAuthModel(result.get(0).getEmail(), result.get(0).getPassword()));
     }
 
     public ResponseEntity<HttpStatus> deleteUser(String email) throws SQLException {
@@ -87,6 +103,36 @@ public class UserService {
             return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update user", ex);
+        }
+    }
+
+    public ResponseEntity<HttpStatus> updatePassword(ChangePasswordRequest changePasswordRequest) throws SQLException {
+        if (StringUtils.isEmpty(changePasswordRequest.getEmail())
+                || StringUtils.isEmpty(changePasswordRequest.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(changePasswordRequest.getEmail()));
+
+            // user does not exist
+            if (resUser.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            UsersRecord user = resUser.get(0);
+
+            if (Boolean.FALSE.equals(PASSWORD_ENCRYPTOR.checkPassword(changePasswordRequest.getPassword(), user.getPassword()))) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            dslContext.update(USERS)
+                    .set(USERS.PASSWORD, PASSWORD_ENCRYPTOR.encryptPassword(changePasswordRequest.getNewPassword()))
+                    .where(USERS.EMAIL.eq(changePasswordRequest.getEmail()))
+                    .execute();
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Update password failed", ex);
         }
     }
 

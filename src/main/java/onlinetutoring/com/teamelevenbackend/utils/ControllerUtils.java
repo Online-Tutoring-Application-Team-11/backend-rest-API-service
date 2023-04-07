@@ -1,4 +1,4 @@
-package onlinetutoring.com.teamelevenbackend.controller;
+package onlinetutoring.com.teamelevenbackend.utils;
 
 public final class ControllerUtils {
     public static final String BASE_PRODUCTION = "";
