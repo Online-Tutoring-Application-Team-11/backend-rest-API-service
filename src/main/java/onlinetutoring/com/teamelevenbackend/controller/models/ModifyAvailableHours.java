@@ -1,9 +1,11 @@
 package onlinetutoring.com.teamelevenbackend.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import onlinetutoring.com.teamelevenbackend.models.enums.Days;
 
 import java.time.LocalTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ModifyAvailableHours extends AbstractUpdateRequest {
     private LocalTime startTime;
     private LocalTime endTime;
