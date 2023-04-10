@@ -197,6 +197,10 @@ public class TutorService {
 
             UsersRecord user = resUser.get(0);
 
+            // This code is really-bad - ik
+            // We are assuming that the FE is going to pass available hours with no overlap
+            // otherwise there will be a lot of things breaking
+
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS,
                     AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()),
                     AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()),
