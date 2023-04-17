@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/delete/{email}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("email") String email) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable(value = "email", required = false) String email) {
         try {
             return userService.deleteUser(email);
         } catch (Exception ex) {

@@ -1,5 +1,8 @@
 package onlinetutoring.com.teamelevenbackend.controller.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateProfileRequest extends AbstractUpdateRequest {
     private String fName;
     private String lName;

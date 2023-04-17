@@ -3,7 +3,7 @@ package onlinetutoring.com.teamelevenbackend.controller.models;
 import java.io.Serial;
 import java.io.Serializable;
 
-public abstract class AbstractUpdateRequest implements Serializable{
+public abstract class AbstractUpdateRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
