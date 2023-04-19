@@ -4,42 +4,37 @@ import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
-import onlinetutoring.com.teamelevenbackend.controller.models.UpdateAppointmentRequest;
-import onlinetutoring.com.teamelevenbackend.controller.models.UpdateStudentRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.*;
-import onlinetutoring.com.teamelevenbackend.models.StudentUser;
-import onlinetutoring.com.teamelevenbackend.models.TutorUser;
-import onlinetutoring.com.teamelevenbackend.models.enums.Days;
+import onlinetutoring.com.teamelevenbackend.controller.models.CreateAppointmentRequest;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AvailableHoursRecord;
+
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.*;
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
+import static onlinetutoring.com.teamelevenbackend.entity.tables.Appointments.APPOINTMENTS;
+import static onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours.AVAILABLE_HOURS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
+import static onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS;
 
-@Service
+@Component
 public class AppointmentService {
 
     private DSLContext dslContext;
-    private AuthService authService;
 
     @Autowired
     public void setDslContext(DSLContext dslContext) {
         this.dslContext = dslContext;
     }
 
-
-    public ResponseEntity<AppointmentsRecord> getAppointmentByTutorEmail(String email) throws SQLException {
+    public ResponseEntity<AppointmentsRecord> getAppointmentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -51,31 +46,79 @@ public class AppointmentService {
             }
             UsersRecord usersRecord = userData.get(0);
 
-            Result<AppointmentsRecord> appointmentData = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.TUTOR_ID.eq(usersRecord.getId()));
+            Result<AppointmentsRecord> appointmentData = Boolean.TRUE.equals(usersRecord.getTutor())
+                    ? dslContext.fetch(APPOINTMENTS, APPOINTMENTS.TUTOR_ID.eq(usersRecord.getId()))
+                    : dslContext.fetch(APPOINTMENTS, APPOINTMENTS.STUDENT_ID.eq(usersRecord.getId()));
+
             if (appointmentData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
+            return new ResponseEntity<>(buildAppointment(appointmentData.get(0)), HttpStatus.OK);
+        } catch (Exception ex) {
+            throw new SQLException("Could not query data", ex);
+        }
+    }
 
-            return new ResponseEntity<>(this.buildAppointment(appointmentData.get(0)), HttpStatus.OK);
+    public ResponseEntity<AppointmentsRecord> getAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
+        if (StringUtils.isEmpty(studentEmail) || StringUtils.isEmpty(tutorEmail)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(studentEmail));
+            if (userDataStudent.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            UsersRecord usersRecordStu = userDataStudent.get(0);
+
+            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(tutorEmail));
+            if (userDataTutor.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            UsersRecord usersRecordTutor = userDataTutor.get(0);
+
+            Result<AppointmentsRecord> appointmentData = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()),
+                    APPOINTMENTS.STUDENT_ID.eq(usersRecordStu.getId()));
+
+            if (appointmentData.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(buildAppointment(appointmentData.get(0)), HttpStatus.OK);
 
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
         }
     }
 
-
-    public boolean insertIntoAppointments(int tutorId, int studentId, LocalDateTime requestedStartTime,
-                                          LocalDateTime requestedEndTime, String subject) throws SQLException {
-        // TO DO Check if TutorId is empty
-        if (Objects.isNull(requestedStartTime)
-                || Objects.isNull(requestedEndTime)
-                || StringUtils.isEmpty(subject))
-            return false;
+    public ResponseEntity<AppointmentsRecord> insertIntoAppointments(CreateAppointmentRequest createAppointmentRequest) throws SQLException {
+        if (StringUtils.isEmpty(createAppointmentRequest.getStudentEmail())
+                || StringUtils.isEmpty(createAppointmentRequest.getTutorEmail())
+                || StringUtils.isEmpty(createAppointmentRequest.getSubject())
+                || createAppointmentRequest.getRequestedStartTime() == null
+                || createAppointmentRequest.getRequestedEndTime() == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
         try {
-            if (!this.isTutorAvailableForAppointment(tutorId, requestedStartTime, requestedEndTime)) {
-                return false;
+            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(studentEmail));
+            if (userDataStudent.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            UsersRecord usersRecordStu = userDataStudent.get(0);
+
+            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(tutorEmail));
+            if (userDataTutor.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            UsersRecord usersRecordTutor = userDataTutor.get(0);
+
+            if (!this.isTutorAvailableForAppointment(createAppointmentRequest.getTutorEmail(),
+                    createAppointmentRequest.getRequestedStartTime(),
+                    createAppointmentRequest.getRequestedStartTime())) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             dslContext.insertInto(APPOINTMENTS)
@@ -87,7 +130,8 @@ public class AppointmentService {
                     .execute();
 
 
-            Result<AppointmentsRecord> appointment = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.TUTOR_ID.eq(tutorId));
+            Result<AppointmentsRecord> appointment = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.TUTOR_ID.eq(tutorId));
 
             // check if insert failed
             return !appointment.isEmpty();
@@ -149,58 +193,6 @@ public class AppointmentService {
         return false;
     }
 
-    public ResponseEntity<AppointmentsRecord> updateAppointment(UpdateAppointmentRequest updateAppointmentRequest) throws SQLException {
-        if (StringUtils.isEmpty(updateAppointmentRequest.getEmail())
-                || Objects.isNull(updateAppointmentRequest.getRequestedStartTime())
-                || Objects.isNull(updateAppointmentRequest.getRequestedEndTime())
-                || StringUtils.isEmpty(updateAppointmentRequest.getSubject())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(updateAppointmentRequest.getEmail()));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
-
-            Result<AppointmentsRecord> appointment = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.STUDENT_ID.eq(usersRecord.getId()));
-            if (appointment.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            AppointmentsRecord appointmentData = appointment.get(0);
-
-            // update appointments
-            dslContext.update(APPOINTMENTS)
-                    .set(APPOINTMENTS.SUBJECT, updateAppointmentRequest.getSubject())
-                    .set(APPOINTMENTS.START_TIME, updateAppointmentRequest.getRequestedStartTime())
-                    .set(APPOINTMENTS.END_TIME, updateAppointmentRequest.getRequestedEndTime())
-                    .where(APPOINTMENTS.STUDENT_ID.eq(appointmentData.getStudentId()))
-                    .execute();
-
-
-            AppointmentsRecord resAppointment = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.STUDENT_ID.eq(appointmentData.getStudentId())).get(0);
-
-            return new ResponseEntity<>(this.buildAppointment(resAppointment), HttpStatus.OK);
-        } catch (Exception ex) {
-            throw new SQLException("Could not update appointment", ex);
-        }
-    }
-
-    private AppointmentsRecord buildAppointment(AppointmentsRecord appointmentsRecord) {
-        AppointmentsRecord response = new AppointmentsRecord();
-
-        // appointment data
-        response.setTutorId(appointmentsRecord.getTutorId());
-        response.setStudentId(appointmentsRecord.getStudentId());
-        response.setStartTime(appointmentsRecord.getStartTime());
-        response.setEndTime(appointmentsRecord.getEndTime());
-        response.setSubject(appointmentsRecord.getSubject());
-        return response;
-    }
-
-    //Delete Appointment
     public ResponseEntity<HttpStatus> deleteAppointment(String email, LocalDateTime requestedStartTime,
                                                         LocalDateTime requestedEndTime) throws SQLException {
         if (StringUtils.isEmpty(email)) {
@@ -242,5 +234,17 @@ public class AppointmentService {
         } catch (Exception ex) {
             throw new SQLException("Could not delete Appointment", ex);
         }
+    }
+
+    private static AppointmentsRecord buildAppointment(AppointmentsRecord appointmentsRecord) {
+        AppointmentsRecord response = new AppointmentsRecord();
+
+        // appointment data
+        response.setTutorId(appointmentsRecord.getTutorId());
+        response.setStudentId(appointmentsRecord.getStudentId());
+        response.setStartTime(appointmentsRecord.getStartTime());
+        response.setEndTime(appointmentsRecord.getEndTime());
+        response.setSubject(appointmentsRecord.getSubject());
+        return response;
     }
 }
