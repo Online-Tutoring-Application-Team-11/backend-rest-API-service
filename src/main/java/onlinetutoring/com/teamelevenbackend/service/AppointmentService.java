@@ -103,38 +103,36 @@ public class AppointmentService {
         }
 
         try {
-            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(studentEmail));
+            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(createAppointmentRequest.getStudentEmail()));
             if (userDataStudent.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             UsersRecord usersRecordStu = userDataStudent.get(0);
 
-            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(tutorEmail));
+            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(createAppointmentRequest.getTutorEmail()));
             if (userDataTutor.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             UsersRecord usersRecordTutor = userDataTutor.get(0);
 
-            if (!this.isTutorAvailableForAppointment(createAppointmentRequest.getTutorEmail(),
+            if (!this.isTutorAvailableForAppointment(usersRecordTutor.getId(),
                     createAppointmentRequest.getRequestedStartTime(),
-                    createAppointmentRequest.getRequestedStartTime())) {
+                    createAppointmentRequest.getRequestedEndTime())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             dslContext.insertInto(APPOINTMENTS)
-                    .set(APPOINTMENTS.TUTOR_ID, tutorId)
-                    .set(APPOINTMENTS.STUDENT_ID, studentId)
-                    .set(APPOINTMENTS.START_TIME, requestedStartTime)
-                    .set(APPOINTMENTS.END_TIME, requestedEndTime)
-                    .set(APPOINTMENTS.SUBJECT, subject)
+                    .set(APPOINTMENTS.TUTOR_ID, usersRecordTutor.getId())
+                    .set(APPOINTMENTS.STUDENT_ID, usersRecordStu.getId())
+                    .set(APPOINTMENTS.START_TIME, createAppointmentRequest.getRequestedStartTime())
+                    .set(APPOINTMENTS.END_TIME, createAppointmentRequest.getRequestedEndTime())
+                    .set(APPOINTMENTS.SUBJECT, createAppointmentRequest.getSubject())
                     .execute();
 
-
             Result<AppointmentsRecord> appointment = dslContext.fetch(APPOINTMENTS,
-                    APPOINTMENTS.TUTOR_ID.eq(tutorId));
+                    APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()));
 
-            // check if insert failed
-            return !appointment.isEmpty();
+            return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not insert data into appointment", ex);
         }
