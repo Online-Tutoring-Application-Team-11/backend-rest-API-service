@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
-import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,10 +24,12 @@ public class StudentService {
 
     private static final List<Integer> YEARS = new ArrayList<>(Arrays.asList(0,1,2,3,4));
 
+    private UserService userService;
     private DSLContext dslContext;
     private TutorService tutorService;
     @Autowired
-    public void setInternalAuthService(DSLContext dslContext, TutorService tutorService) {
+    public void setInternalAuthService(UserService userService, DSLContext dslContext, TutorService tutorService) {
+        this.userService = userService;
         this.dslContext = dslContext;
         this.tutorService = tutorService;
     }
@@ -39,11 +40,7 @@ public class StudentService {
         }
 
         try {
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
+            UsersRecord usersRecord = userService.get(email);
 
             Result<StudentsRecord> studentData = dslContext.fetch(STUDENTS, STUDENTS.ID.eq(usersRecord.getId()));
             if (studentData.isEmpty()) {
@@ -85,14 +82,7 @@ public class StudentService {
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateStudentRequest.getEmail()));
-
-            // user does not exists
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            UsersRecord user = resUser.get(0);
+            UsersRecord user = userService.get(updateStudentRequest.getEmail());
 
             // update students
             dslContext.update(STUDENTS)

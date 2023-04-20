@@ -32,9 +32,11 @@ import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 @Component
 public class TutorService {
 
+    private UserService userService;
     private DSLContext dslContext;
     @Autowired
-    public void setDslContext(DSLContext dslContext) {
+    public void setTutorService(DSLContext dslContext, UserService userService) {
+        this.userService = userService;
         this.dslContext = dslContext;
     }
 
@@ -101,11 +103,7 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
+            UsersRecord usersRecord = userService.get(email);
 
             Result<TutorsRecord> tutorData = dslContext.fetch(TUTORS, TUTORS.ID.eq(usersRecord.getId()));
             if (tutorData.isEmpty()) {
@@ -124,14 +122,7 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(updateTutorRequest.getEmail()));
-
-            // user does not exists
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            UsersRecord user = resUser.get(0);
+            UsersRecord user = userService.get(updateTutorRequest.getEmail());
 
             // update tutors
             dslContext.update(TUTORS)
@@ -153,14 +144,12 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-
             // user does not exists
-            if (resUser.isEmpty() || !Boolean.TRUE.equals(resUser.get(0).getTutor())) {
+            if (userService.get(email) == null || !Boolean.TRUE.equals(userService.get(email).getTutor())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            UsersRecord user = resUser.get(0);
+            UsersRecord user = userService.get(email);
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
             if (availableHoursRecord.isEmpty()) {
                 return new ResponseEntity<>(Collections.emptyList(), HttpStatus.ACCEPTED);
@@ -185,10 +174,7 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(modifyAvailableHours.getEmail()));
-
-            // user does not exists
-            if (resUser.isEmpty() || !Boolean.TRUE.equals(resUser.get(0).getTutor())) {
+            if (userService.get(modifyAvailableHours.getEmail()) == null || !Boolean.TRUE.equals(userService.get(modifyAvailableHours.getEmail()).getTutor())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
@@ -197,7 +183,7 @@ public class TutorService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            UsersRecord user = resUser.get(0);
+            UsersRecord user = userService.get(modifyAvailableHours.getEmail());
 
             // This code is really-bad - ik
             // We are assuming that the FE is going to pass available hours with no overlap
@@ -232,14 +218,7 @@ public class TutorService {
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-
-            // user does not exists
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
-            UsersRecord user = resUser.get(0);
+            UsersRecord user = userService.get(email);
 
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
 

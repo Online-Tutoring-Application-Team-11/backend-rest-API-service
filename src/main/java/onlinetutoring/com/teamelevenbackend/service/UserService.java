@@ -32,6 +32,14 @@ public class UserService {
         this.dslContext = dslContext;
     }
 
+    public UsersRecord get(String email) {
+        Result<UsersRecord> userData = dslContext.fetch(onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS, onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS.EMAIL.eq(email));
+        if (userData.isEmpty()) {
+            return null;
+        }
+        return userData.get(0);
+    }
+
     public Optional<AbstractAuthModel> findByEmail(String email) {
         Result<UsersRecord> result = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
         if (result.isEmpty()) {
@@ -100,7 +108,7 @@ public class UserService {
 
             UsersRecord user = dslContext.fetch(USERS, USERS.EMAIL.eq(updateProfileRequest.getEmail())).get(0);
 
-            return new ResponseEntity<>(this.buildUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(buildUser(user), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update user", ex);
         }
@@ -136,7 +144,7 @@ public class UserService {
         }
     }
 
-    public Users buildUser(UsersRecord usersRecord) {
+    private static Users buildUser(UsersRecord usersRecord) {
         Users response = new Users();
 
         // user data

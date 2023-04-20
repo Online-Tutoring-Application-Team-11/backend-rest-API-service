@@ -26,15 +26,15 @@ import org.springframework.stereotype.Component;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.Appointments.APPOINTMENTS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours.AVAILABLE_HOURS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
-import static onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS;
 
 @Component
 public class AppointmentService {
 
     private DSLContext dslContext;
-
+    private UserService userService;
     @Autowired
-    public void setDslContext(DSLContext dslContext) {
+    public void setAppointmentService(DSLContext dslContext, UserService userService) {
+        this.userService = userService;
         this.dslContext = dslContext;
     }
 
@@ -44,11 +44,7 @@ public class AppointmentService {
         }
 
         try {
-            Result<UsersRecord> userData = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-            if (userData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecord = userData.get(0);
+            UsersRecord usersRecord = userService.get(email);
 
             Result<AppointmentsRecord> appointmentData = Boolean.TRUE.equals(usersRecord.getTutor())
                     ? dslContext.fetch(APPOINTMENTS, APPOINTMENTS.TUTOR_ID.eq(usersRecord.getId()))
@@ -75,17 +71,8 @@ public class AppointmentService {
         }
 
         try {
-            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(studentEmail));
-            if (userDataStudent.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordStu = userDataStudent.get(0);
-
-            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(tutorEmail));
-            if (userDataTutor.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordTutor = userDataTutor.get(0);
+            UsersRecord usersRecordStu = userService.get(studentEmail);
+            UsersRecord usersRecordTutor = userService.get(tutorEmail);
 
             Result<AppointmentsRecord> appointmentData = dslContext.fetch(APPOINTMENTS,
                     APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()),
@@ -116,17 +103,8 @@ public class AppointmentService {
         }
 
         try {
-            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getStudentEmail()));
-            if (userDataStudent.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordStu = userDataStudent.get(0);
-
-            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getTutorEmail()));
-            if (userDataTutor.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordTutor = userDataTutor.get(0);
+            UsersRecord usersRecordStu = userService.get(appointmentRequest.getStudentEmail());
+            UsersRecord usersRecordTutor = userService.get(appointmentRequest.getTutorEmail());
 
             if (!this.isTutorAvailableForAppointment(usersRecordTutor.getId(),
                     appointmentRequest.getRequestedStartTime(),
@@ -200,10 +178,7 @@ public class AppointmentService {
                         return true;
                     }
                 }
-
             }
-
-
         }
         return false;
     }
@@ -218,17 +193,8 @@ public class AppointmentService {
         }
 
         try {
-            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getStudentEmail()));
-            if (userDataStudent.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordStu = userDataStudent.get(0);
-
-            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getTutorEmail()));
-            if (userDataTutor.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-            UsersRecord usersRecordTutor = userDataTutor.get(0);
+            UsersRecord usersRecordStu = userService.get(appointmentRequest.getStudentEmail());
+            UsersRecord usersRecordTutor = userService.get(appointmentRequest.getTutorEmail());
 
             Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS,
                     APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()),
