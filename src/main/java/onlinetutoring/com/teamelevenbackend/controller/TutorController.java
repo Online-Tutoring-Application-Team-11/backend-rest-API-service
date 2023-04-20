@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
@@ -85,9 +86,10 @@ public class TutorController {
 
     @DeleteMapping(value = "/available-hours/{email}/delete")
     public ResponseEntity<HttpStatus> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
-                                                           @RequestParam(required = false) Days day) {
+                                                           @RequestParam(required = false) Days day,
+                                                           @RequestParam(required = false) LocalTime startTime) {
         try {
-            return tutorService.deleteAvailableHours(email, day);
+            return tutorService.deleteAvailableHours(email, day, startTime);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
