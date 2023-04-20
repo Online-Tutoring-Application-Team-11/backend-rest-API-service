@@ -22,7 +22,6 @@ The backend is deployed using [railway](https://railway.app/dashboard)
 #### NEW ENVIRONMENTS - 
 
 - production - `https://online-tutoring-backend.up.railway.app`
-- dev - `https://online-tutoring-backend-dev.up.railway.app`
 - localhost - `http://localhost:8080`
 
 
@@ -30,5 +29,4 @@ The backend is deployed using [railway](https://railway.app/dashboard)
 
 
 #### TESTING -
-* You can push to the `dev` branch which is deployed at `https://online-tutoring-backend-dev.up.railway.app` 
 * You can use the `postman testing suite` with the app running locally
