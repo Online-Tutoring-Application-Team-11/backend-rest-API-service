@@ -2,11 +2,15 @@ package onlinetutoring.com.teamelevenbackend.controller.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateAppointmentRequest implements Serializable {
+public class AppointmentRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String studentEmail;
     private String tutorEmail;
     private String subject;

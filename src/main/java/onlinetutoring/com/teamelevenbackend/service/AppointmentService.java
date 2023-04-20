@@ -4,8 +4,12 @@ import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import onlinetutoring.com.teamelevenbackend.controller.models.CreateAppointmentRequest;
+import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentRequest;
+import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Appointments;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
@@ -34,7 +38,7 @@ public class AppointmentService {
         this.dslContext = dslContext;
     }
 
-    public ResponseEntity<AppointmentsRecord> getAppointmentByEmail(String email) throws SQLException {
+    public ResponseEntity<List<Appointments>> listAppointmentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -51,16 +55,21 @@ public class AppointmentService {
                     : dslContext.fetch(APPOINTMENTS, APPOINTMENTS.STUDENT_ID.eq(usersRecord.getId()));
 
             if (appointmentData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
             }
 
-            return new ResponseEntity<>(buildAppointment(appointmentData.get(0)), HttpStatus.OK);
+            List<Appointments> response = new ArrayList<>();
+            for (AppointmentsRecord app : appointmentData) {
+                response.add(buildAppointment(app));
+            }
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
         }
     }
 
-    public ResponseEntity<AppointmentsRecord> getAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
+    public ResponseEntity<List<Appointments>> listAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
         if (StringUtils.isEmpty(studentEmail) || StringUtils.isEmpty(tutorEmail)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -83,54 +92,62 @@ public class AppointmentService {
                     APPOINTMENTS.STUDENT_ID.eq(usersRecordStu.getId()));
 
             if (appointmentData.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
             }
 
-            return new ResponseEntity<>(buildAppointment(appointmentData.get(0)), HttpStatus.OK);
+            List<Appointments> response = new ArrayList<>();
+            for (AppointmentsRecord app : appointmentData) {
+                response.add(buildAppointment(app));
+            }
 
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
         }
     }
 
-    public ResponseEntity<AppointmentsRecord> insertIntoAppointments(CreateAppointmentRequest createAppointmentRequest) throws SQLException {
-        if (StringUtils.isEmpty(createAppointmentRequest.getStudentEmail())
-                || StringUtils.isEmpty(createAppointmentRequest.getTutorEmail())
-                || StringUtils.isEmpty(createAppointmentRequest.getSubject())
-                || createAppointmentRequest.getRequestedStartTime() == null
-                || createAppointmentRequest.getRequestedEndTime() == null) {
+    public ResponseEntity<Appointments> insertIntoAppointments(AppointmentRequest appointmentRequest) throws SQLException {
+        if (StringUtils.isEmpty(appointmentRequest.getStudentEmail())
+                || StringUtils.isEmpty(appointmentRequest.getTutorEmail())
+                || StringUtils.isEmpty(appointmentRequest.getSubject())
+                || appointmentRequest.getRequestedStartTime() == null
+                || appointmentRequest.getRequestedEndTime() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(createAppointmentRequest.getStudentEmail()));
+            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getStudentEmail()));
             if (userDataStudent.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             UsersRecord usersRecordStu = userDataStudent.get(0);
 
-            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(createAppointmentRequest.getTutorEmail()));
+            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getTutorEmail()));
             if (userDataTutor.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             UsersRecord usersRecordTutor = userDataTutor.get(0);
 
             if (!this.isTutorAvailableForAppointment(usersRecordTutor.getId(),
-                    createAppointmentRequest.getRequestedStartTime(),
-                    createAppointmentRequest.getRequestedEndTime())) {
+                    appointmentRequest.getRequestedStartTime(),
+                    appointmentRequest.getRequestedEndTime())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
             dslContext.insertInto(APPOINTMENTS)
                     .set(APPOINTMENTS.TUTOR_ID, usersRecordTutor.getId())
                     .set(APPOINTMENTS.STUDENT_ID, usersRecordStu.getId())
-                    .set(APPOINTMENTS.START_TIME, createAppointmentRequest.getRequestedStartTime())
-                    .set(APPOINTMENTS.END_TIME, createAppointmentRequest.getRequestedEndTime())
-                    .set(APPOINTMENTS.SUBJECT, createAppointmentRequest.getSubject())
+                    .set(APPOINTMENTS.START_TIME, appointmentRequest.getRequestedStartTime())
+                    .set(APPOINTMENTS.END_TIME, appointmentRequest.getRequestedEndTime())
+                    .set(APPOINTMENTS.SUBJECT, appointmentRequest.getSubject())
                     .execute();
 
+            // fetch the appointment
             Result<AppointmentsRecord> appointment = dslContext.fetch(APPOINTMENTS,
-                    APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()));
+                    APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()),
+                    APPOINTMENTS.STUDENT_ID.eq(usersRecordStu.getId()),
+                    APPOINTMENTS.SUBJECT.eq(appointmentRequest.getSubject()),
+                    APPOINTMENTS.START_TIME.eq(appointmentRequest.getRequestedStartTime()));
 
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
@@ -191,30 +208,33 @@ public class AppointmentService {
         return false;
     }
 
-    public ResponseEntity<HttpStatus> deleteAppointment(String email, LocalDateTime requestedStartTime,
-                                                        LocalDateTime requestedEndTime) throws SQLException {
-        if (StringUtils.isEmpty(email)) {
+    public ResponseEntity<HttpStatus> deleteAppointment(AppointmentRequest appointmentRequest) throws SQLException {
+        if (StringUtils.isEmpty(appointmentRequest.getStudentEmail())
+                || StringUtils.isEmpty(appointmentRequest.getTutorEmail())
+                || StringUtils.isEmpty(appointmentRequest.getSubject())
+                || appointmentRequest.getRequestedStartTime() == null
+                || appointmentRequest.getRequestedEndTime() == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
-
-            // user does not exists
-            if (resUser.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            Result<UsersRecord> userDataStudent = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getStudentEmail()));
+            if (userDataStudent.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            UsersRecord usersRecordStu = userDataStudent.get(0);
 
-
-            UsersRecord user = resUser.get(0);
-
-            Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.STUDENT_ID.eq(user.getId()));
-
-            // if the day path param is present
-            if ((requestedStartTime != null) && (requestedEndTime != null)) {
-                appointmentsRecords = dslContext.fetch(APPOINTMENTS, APPOINTMENTS.START_TIME.eq(requestedStartTime),
-                        APPOINTMENTS.END_TIME.eq(requestedEndTime));
+            Result<UsersRecord> userDataTutor = dslContext.fetch(USERS, USERS.EMAIL.eq(appointmentRequest.getTutorEmail()));
+            if (userDataTutor.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            UsersRecord usersRecordTutor = userDataTutor.get(0);
+
+            Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()),
+                    APPOINTMENTS.STUDENT_ID.eq(usersRecordStu.getId()),
+                    APPOINTMENTS.SUBJECT.eq(appointmentRequest.getSubject()),
+                    APPOINTMENTS.START_TIME.eq(appointmentRequest.getRequestedStartTime()));
 
             if (appointmentsRecords.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -222,9 +242,11 @@ public class AppointmentService {
 
             // delete from table
             dslContext.deleteFrom(APPOINTMENTS)
-                    .where(APPOINTMENTS.STUDENT_ID.eq(user.getId()))
-                    .and(APPOINTMENTS.START_TIME.eq(requestedStartTime))
-                    .and(APPOINTMENTS.END_TIME.eq(requestedEndTime))
+                    .where(APPOINTMENTS.STUDENT_ID.eq(usersRecordStu.getId()))
+                    .and(APPOINTMENTS.TUTOR_ID.eq(usersRecordTutor.getId()))
+                    .and(APPOINTMENTS.SUBJECT.eq(appointmentRequest.getSubject()))
+                    .and(APPOINTMENTS.START_TIME.eq(appointmentRequest.getRequestedStartTime()))
+                    .and(APPOINTMENTS.END_TIME.eq(appointmentRequest.getRequestedEndTime()))
                     .execute();
 
 
@@ -234,15 +256,15 @@ public class AppointmentService {
         }
     }
 
-    private static AppointmentsRecord buildAppointment(AppointmentsRecord appointmentsRecord) {
-        AppointmentsRecord response = new AppointmentsRecord();
+    private static Appointments buildAppointment(AppointmentsRecord appointmentsRecord) {
+        Appointments response = new Appointments();
 
-        // appointment data
         response.setTutorId(appointmentsRecord.getTutorId());
         response.setStudentId(appointmentsRecord.getStudentId());
         response.setStartTime(appointmentsRecord.getStartTime());
         response.setEndTime(appointmentsRecord.getEndTime());
         response.setSubject(appointmentsRecord.getSubject());
+
         return response;
     }
 }
