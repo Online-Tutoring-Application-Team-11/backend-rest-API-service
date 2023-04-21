@@ -32,7 +32,7 @@ public class StudentController {
     }
 
     @GetMapping(value = "/get/{email}")
-    public ResponseEntity<StudentUser> getStudent(@PathVariable("email") String email) {
+    public ResponseEntity<StudentUser> getStudent(@PathVariable(value = "email", required = false) String email) {
         try {
             return studentService.getStudentByEmail(email);
         } catch (Exception ex) {

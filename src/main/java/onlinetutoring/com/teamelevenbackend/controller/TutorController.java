@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
@@ -48,7 +49,7 @@ public class TutorController {
     }
 
     @GetMapping(value = "/get/{email}")
-    public ResponseEntity<TutorUser> getTutor(@PathVariable("email") String email) {
+    public ResponseEntity<TutorUser> getTutor(@PathVariable(value = "email", required = false) String email) {
         try{
             return tutorService.getTutorByEmail(email);
         }catch (Exception ex){
@@ -66,7 +67,7 @@ public class TutorController {
     }
 
     @GetMapping(value = "/get/{email}/available-hours")
-    public ResponseEntity<List<AvailableHours>> getAvailableHours(@PathVariable("email") String email) {
+    public ResponseEntity<List<AvailableHours>> getAvailableHours(@PathVariable(value = "email", required = false) String email) {
         try {
             return tutorService.getAvailableHours(email);
         } catch (Exception ex) {
@@ -84,10 +85,11 @@ public class TutorController {
     }
 
     @DeleteMapping(value = "/available-hours/{email}/delete")
-    public ResponseEntity<HttpStatus> deleteAvailableHours(@PathVariable("email") String email,
-                                                           @RequestParam(required = false) Days day) {
+    public ResponseEntity<HttpStatus> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
+                                                           @RequestParam(required = false) Days day,
+                                                           @RequestParam(required = false) LocalTime startTime) {
         try {
-            return tutorService.deleteAvailableHours(email, day);
+            return tutorService.deleteAvailableHours(email, day, startTime);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

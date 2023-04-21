@@ -18,9 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.InputMismatchException;
 import java.util.List;
 
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.AVAILABLE_HOURS;
@@ -197,26 +199,26 @@ public class TutorService {
 
             UsersRecord user = resUser.get(0);
 
-            Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()));
+            // This code is really-bad - ik
+            // We are assuming that the FE is going to pass available hours with no overlap
+            // otherwise there will be a lot of things breaking
+
+            Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS,
+                    AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()),
+                    AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()),
+                    AVAILABLE_HOURS.START_TIME.eq(modifyAvailableHours.getStartTime()));
 
             if (availableHoursRecord.isNotEmpty()) {
-                // update available hours
-                dslContext.update(AVAILABLE_HOURS)
-                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
-                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
-                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
-                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
-                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()))
-                        .execute();
-            } else {
-                // insert into table
-                dslContext.insertInto(AVAILABLE_HOURS)
-                        .set(AVAILABLE_HOURS.TUTOR_ID, user.getId())
-                        .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
-                        .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
-                        .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
-                        .execute();
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
+
+            // insert into table
+            dslContext.insertInto(AVAILABLE_HOURS)
+                    .set(AVAILABLE_HOURS.TUTOR_ID, user.getId())
+                    .set(AVAILABLE_HOURS.START_TIME, modifyAvailableHours.getStartTime())
+                    .set(AVAILABLE_HOURS.END_TIME, modifyAvailableHours.getEndTime())
+                    .set(AVAILABLE_HOURS.DAY_OF_WEEK, modifyAvailableHours.getDayOfWeek().toString())
+                    .execute();
 
             return this.getAvailableHours(user.getEmail());
         } catch (Exception ex) {
@@ -224,7 +226,7 @@ public class TutorService {
         }
     }
 
-    public ResponseEntity<HttpStatus> deleteAvailableHours(String email, Days day) throws SQLException {
+    public ResponseEntity<HttpStatus> deleteAvailableHours(String email, Days day, LocalTime startTime) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -237,7 +239,6 @@ public class TutorService {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            // if start time is after end time
             UsersRecord user = resUser.get(0);
 
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
@@ -252,15 +253,23 @@ public class TutorService {
             }
 
             // delete from table
-            if (day == null) {
+            if (day != null && startTime != null) {
                 dslContext.deleteFrom(AVAILABLE_HOURS)
                         .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()))
+                        .and(AVAILABLE_HOURS.START_TIME.eq(startTime))
                         .execute();
-            } else {
+            } else if (day != null) {
                 dslContext.deleteFrom(AVAILABLE_HOURS)
                         .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
                         .and(AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()))
                         .execute();
+            } else if (startTime == null) {
+                dslContext.deleteFrom(AVAILABLE_HOURS)
+                        .where(AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()))
+                        .execute();
+            } else {
+                throw new InputMismatchException("Wrong input provided");
             }
 
             return new ResponseEntity<>(HttpStatus.OK);
