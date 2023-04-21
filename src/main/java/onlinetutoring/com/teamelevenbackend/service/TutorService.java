@@ -82,11 +82,11 @@ public class TutorService {
 
     public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
         try {
-        dslContext.insertInto(TUTORS)
-                .set(TUTORS.ID, id)
-                .set(TUTORS.SUBJECTS, subjects.toArray(new String[0]))
-                .execute();
-        // NOTE: Maximum subjects taught by a tutor is 100
+            dslContext.insertInto(TUTORS)
+                    .set(TUTORS.ID, id)
+                    .set(TUTORS.SUBJECTS, subjects.toArray(new String[0]))
+                    .execute();
+            // NOTE: Maximum subjects taught by a tutor is 100
 
             Result<TutorsRecord> resTutors = dslContext.fetch(TUTORS, TUTORS.ID.eq(id));
 
@@ -185,17 +185,12 @@ public class TutorService {
 
             UsersRecord user = userService.get(modifyAvailableHours.getEmail());
 
-            // This code is really-bad - ik
-            // We are assuming that the FE is going to pass available hours with no overlap
-            // otherwise there will be a lot of things breaking
-
             Result<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS,
                     AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()),
-                    AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()),
-                    AVAILABLE_HOURS.START_TIME.eq(modifyAvailableHours.getStartTime()));
+                    AVAILABLE_HOURS.DAY_OF_WEEK.eq(modifyAvailableHours.getDayOfWeek().toString()));
 
-            if (availableHoursRecord.isNotEmpty()) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            if (Boolean.FALSE.equals(verifyAvailableHours(modifyAvailableHours, availableHoursRecord))) {
+                throw new InputMismatchException("Available hours overlap");
             }
 
             // insert into table
@@ -210,6 +205,23 @@ public class TutorService {
         } catch (Exception ex) {
             throw new SQLException("Could not update AvailableHours", ex);
         }
+    }
+
+    private static boolean verifyAvailableHours(ModifyAvailableHours modifyAvailableHours, Result<AvailableHoursRecord> availableHoursRecords) {
+        LocalTime reqStartTime = modifyAvailableHours.getStartTime();
+        LocalTime reqEndTime = modifyAvailableHours.getEndTime();
+
+        for (AvailableHoursRecord current : availableHoursRecords) {
+            if (!reqStartTime.isBefore(current.getStartTime()) && reqStartTime.isBefore(current.getEndTime())) {
+                return false;
+            }
+
+            if (!reqStartTime.isAfter(current.getStartTime()) && reqEndTime.isAfter(current.getStartTime())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public ResponseEntity<HttpStatus> deleteAvailableHours(String email, Days day, LocalTime startTime) throws SQLException {
