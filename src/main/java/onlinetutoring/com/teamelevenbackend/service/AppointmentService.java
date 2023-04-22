@@ -2,6 +2,7 @@ package onlinetutoring.com.teamelevenbackend.service;
 
 import java.sql.SQLException;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -204,6 +205,13 @@ public class AppointmentService {
 
             if (appointmentsRecords.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            // Cannot delete because the difference between current time and appointment start time
+            // is less than 24 hours now
+            Duration duration = Duration.between(LocalDateTime.now(), appointmentsRecords.get(0).getStartTime());
+            if (duration.toHours() <= 24) {
+                return new ResponseEntity<>(HttpStatus.ACCEPTED);
             }
 
             // delete from table
