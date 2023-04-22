@@ -4,6 +4,7 @@ import onlinetutoring.com.teamelevenbackend.controller.models.UpdateProfileReque
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.AbstractAuthModel;
 import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswordRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jooq.DSLContext;
@@ -15,8 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.APPOINTMENTS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.TUTORS;
 import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
@@ -142,6 +146,37 @@ public class UserService {
         } catch (Exception ex) {
             throw new SQLException("Update password failed", ex);
         }
+    }
+
+    public void updateTotalHours(UsersRecord user) {
+        if (user == null) {
+            return;
+        }
+
+        Result<AppointmentsRecord> appointmentsRecord;
+
+        if (Boolean.TRUE.equals(user.getTutor())) {
+             appointmentsRecord = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.TUTOR_ID.eq(user.getId()),
+                    APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
+        } else {
+            appointmentsRecord = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.STUDENT_ID.eq(user.getId()),
+                    APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
+        }
+
+        if (appointmentsRecord.isEmpty()) {
+            return;
+        }
+
+        int totalDuration = 0;
+        for (AppointmentsRecord app : appointmentsRecord) {
+            totalDuration += Math.toIntExact(Duration.between(app.getStartTime(), app.getEndTime()).toHours());
+        }
+
+        dslContext.update(USERS)
+                .set(USERS.TOTAL_HOURS, totalDuration)
+                .execute();
     }
 
     private static Users buildUser(UsersRecord usersRecord) {

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import onlinetutoring.com.teamelevenbackend.entity.tables.Appointments;
 
 import org.jooq.Field;
-import org.jooq.Record3;
 import org.jooq.Record5;
 import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -103,8 +102,8 @@ public class AppointmentsRecord extends UpdatableRecordImpl<AppointmentsRecord> 
     // -------------------------------------------------------------------------
 
     @Override
-    public Record3<Integer, Integer, String> key() {
-        return (Record3) super.key();
+    public Record5<Integer, Integer, String, LocalDateTime, LocalDateTime> key() {
+        return (Record5) super.key();
     }
 
     // -------------------------------------------------------------------------

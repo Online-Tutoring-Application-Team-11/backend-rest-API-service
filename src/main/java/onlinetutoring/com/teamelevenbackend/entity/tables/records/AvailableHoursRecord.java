@@ -9,7 +9,7 @@ import java.time.LocalTime;
 import onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours;
 
 import org.jooq.Field;
-import org.jooq.Record2;
+import org.jooq.Record3;
 import org.jooq.Record4;
 import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -88,8 +88,8 @@ public class AvailableHoursRecord extends UpdatableRecordImpl<AvailableHoursReco
     // -------------------------------------------------------------------------
 
     @Override
-    public Record2<Integer, String> key() {
-        return (Record2) super.key();
+    public Record3<Integer, LocalTime, String> key() {
+        return (Record3) super.key();
     }
 
     // -------------------------------------------------------------------------
