@@ -128,6 +128,10 @@ public class AppointmentService {
                     APPOINTMENTS.SUBJECT.eq(appointmentRequest.getSubject()),
                     APPOINTMENTS.START_TIME.eq(appointmentRequest.getRequestedStartTime()));
 
+            // update total hours for both student and tutor
+            userService.updateTotalHours(usersRecordStu);
+            userService.updateTotalHours(usersRecordTutor);
+
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not insert data into appointment", ex);
@@ -223,6 +227,9 @@ public class AppointmentService {
                     .and(APPOINTMENTS.END_TIME.eq(appointmentRequest.getRequestedEndTime()))
                     .execute();
 
+            // update total hours for both student and tutor
+            userService.updateTotalHours(usersRecordStu);
+            userService.updateTotalHours(usersRecordTutor);
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {

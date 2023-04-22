@@ -29,11 +29,14 @@ public class AuthService {
     private DSLContext dslContext;
     private StudentService studentService;
     private TutorService tutorService;
+    private UserService userService;
     @Autowired
-    public void setInternalAuthService(DSLContext dslContext, TutorService tutorService, StudentService studentService) {
+    public void setInternalAuthService(DSLContext dslContext, TutorService tutorService,
+                                       StudentService studentService, UserService userService) {
         this.dslContext = dslContext;
         this.tutorService = tutorService;
         this.studentService = studentService;
+        this.userService = userService;
     }
 
     private JwtService jwtService;
@@ -112,6 +115,9 @@ public class AuthService {
             if (!PASSWORD_ENCRYPTOR.checkPassword(loginRequest.getPassword(), user.getPassword())) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
+
+            userService.updateTotalHours(user);
+            user = userService.get(loginRequest.getEmail());
 
             return new ResponseEntity<>(this.buildUser(user, jwtService.generateToken(loginRequest)), HttpStatus.OK);
         } catch (Exception ex) {
