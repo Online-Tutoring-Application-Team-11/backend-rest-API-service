@@ -1,20 +1,17 @@
 package onlinetutoring.com.teamelevenbackend.service;
 
 import java.sql.SQLException;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.*;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
+import javax.mail.Session;
+import javax.mail.Transport;
 
 import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentRequest;
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Appointments;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
-import onlinetutoring.com.teamelevenbackend.entity.tables.records.AvailableHoursRecord;
+import onlinetutoring.com.teamelevenbackend.entity.tables.records.*;
 
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -24,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.STUDENTS;
+import static onlinetutoring.com.teamelevenbackend.entity.Tables.USERS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.Appointments.APPOINTMENTS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.AvailableHours.AVAILABLE_HOURS;
 import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
@@ -131,6 +130,8 @@ public class AppointmentService {
             // update total hours for both student and tutor
             userService.updateTotalHours(usersRecordStu);
             userService.updateTotalHours(usersRecordTutor);
+
+            // Send confirmation email to the student
 
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
@@ -248,4 +249,88 @@ public class AppointmentService {
 
         return response;
     }
+
+    // Sends confirmation email to the student
+    private void sendConfirmationEmail(int studentId, LocalDateTime startTime, String subject) {
+        // Get student's email address from the database using studentId
+        String studentEmail = getEmailAddress(studentId);
+
+        // Construct email content
+        String emailSubject = "Appointment confirmation for " + subject;
+        String emailBody = "Dear student,\n\nYour appointment for " + subject + " is confirmed for " +
+                startTime.toString() + ".\n\nPlease contact us if you have any questions or need to reschedule.\n\n" +
+                "Best regards,\nA+ Online Tutoring";
+
+
+        // Send email
+        try {
+            sendEmail(studentEmail, emailSubject, emailBody);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Sends reminder email to the student 15 minutes before the appointment
+    private void sendReminderEmail(int studentId, LocalDateTime requestedStartTime, String subject) {
+
+        String studentEmail = getEmailAddress(studentId);
+
+        // Calculate the appointment start time, 15 minutes before the actual start time
+        LocalDateTime reminderTime = requestedStartTime.minusMinutes(15);
+
+        // Construct email content
+        String emailSubject = "Appointment reminder for " + subject;
+        String emailBody = "Dear student,\n\nThis is a reminder that your appointment for " + subject +
+                " is scheduled to start in 15 minutes, at " + requestedStartTime.toString() + ".\n\nPlease be on time and " +
+                "ready for the appointment.\n\nBest regards,\nA+ Online Tutoring";
+
+        // Send email
+        TimerTask reminderTask = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    sendEmail(studentEmail, emailSubject, emailBody);
+                } catch (MessagingException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        };
+        Timer reminderTimer = new Timer();
+        reminderTimer.schedule(reminderTask, Date.from(reminderTime.atZone(ZoneId.systemDefault()).toInstant()));
+
+
+    }
+
+    private String getEmailAddress(int id) {
+        Result<UsersRecord>userRecords = dslContext.fetch(USERS,USERS.ID.eq(id));
+        return userRecords.get(0).getEmail();
+    }
+
+    // Send an email using a third-party email service
+    public static void sendEmail(String studentEmail, String emailSubject, String body) throws MessagingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+// We need to create gmail account, eg A+Tutoring@gmail.com
+        String senderEmail = "-----@gmail.com";
+        String senderPassword = "test1234";
+
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+                return new javax.mail.PasswordAuthentication(senderEmail, senderPassword);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(senderEmail));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(studentEmail));
+        message.setSubject(emailSubject);
+        message.setText(body);
+
+        Transport.send(message);
+    }
+
 }
