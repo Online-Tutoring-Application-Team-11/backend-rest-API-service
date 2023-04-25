@@ -33,10 +33,12 @@ public class AppointmentService {
 
     private DSLContext dslContext;
     private UserService userService;
+    private EmailService emailService;
     @Autowired
-    public void setAppointmentService(DSLContext dslContext, UserService userService) {
+    public void setAppointmentService(DSLContext dslContext, UserService userService, EmailService emailService) {
         this.userService = userService;
         this.dslContext = dslContext;
+        this.emailService = emailService;
     }
 
     public ResponseEntity<List<Appointments>> listAppointmentByEmail(String email) throws SQLException {
@@ -131,6 +133,9 @@ public class AppointmentService {
             // update total hours for both student and tutor
             userService.updateTotalHours(usersRecordStu);
             userService.updateTotalHours(usersRecordTutor);
+
+            emailService.sendSimpleEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject());
+            emailService.sendSimpleEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject());
 
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
