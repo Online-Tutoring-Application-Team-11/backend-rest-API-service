@@ -134,8 +134,9 @@ public class AppointmentService {
             userService.updateTotalHours(usersRecordStu);
             userService.updateTotalHours(usersRecordTutor);
 
-            emailService.sendSimpleEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject());
-            emailService.sendSimpleEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject());
+            // send confirmation emails
+            emailService.sendConfirmationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendConfirmationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
 
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
@@ -235,6 +236,10 @@ public class AppointmentService {
             // update total hours for both student and tutor
             userService.updateTotalHours(usersRecordStu);
             userService.updateTotalHours(usersRecordTutor);
+
+            // send cancellation emails
+            emailService.sendCancellationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendCancellationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
