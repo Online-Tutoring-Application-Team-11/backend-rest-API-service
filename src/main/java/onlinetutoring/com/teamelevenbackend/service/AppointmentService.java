@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -135,8 +136,8 @@ public class AppointmentService {
             userService.updateTotalHours(usersRecordTutor);
 
             // send confirmation emails
-            //emailService.sendConfirmationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
-           // emailService.sendConfirmationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendConfirmationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendConfirmationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
 
             return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
@@ -238,12 +239,36 @@ public class AppointmentService {
             userService.updateTotalHours(usersRecordTutor);
 
             // send cancellation emails
-           // emailService.sendCancellationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
-           // emailService.sendCancellationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendCancellationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
+            emailService.sendCancellationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
 
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not delete Appointment", ex);
+        }
+    }
+
+    public List<Appointments> getReminderAppointments() {
+
+        // create a LocalDateTime object representing 15 minutes from now
+        LocalDateTime fifteenMinutesFromNow = LocalDateTime.now().plus(15, ChronoUnit.MINUTES);
+
+        // create a LocalDateTime object representing 16 minutes from now
+        LocalDateTime sixteenMinutesFromNow = LocalDateTime.now().plus(16, ChronoUnit.MINUTES);
+
+        List<Appointments> emailList = new ArrayList<>();
+
+        try {
+            Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.START_TIME.between(fifteenMinutesFromNow, sixteenMinutesFromNow));
+
+            for (AppointmentsRecord app : appointmentsRecords) {
+                emailList.add(buildAppointment(app));
+            }
+
+            return emailList;
+        } catch (Exception ex) {
+            return Collections.emptyList();
         }
     }
 
