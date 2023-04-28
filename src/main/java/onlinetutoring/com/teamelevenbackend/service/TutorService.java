@@ -224,7 +224,7 @@ public class TutorService {
         return true;
     }
 
-    public ResponseEntity<HttpStatus> deleteAvailableHours(String email, Days day, LocalTime startTime) throws SQLException {
+    public ResponseEntity<List<AvailableHours>> deleteAvailableHours(String email, Days day, LocalTime startTime) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -263,7 +263,24 @@ public class TutorService {
                 throw new InputMismatchException("Wrong input provided");
             }
 
-            return new ResponseEntity<>(HttpStatus.OK);
+            List<AvailableHours> deletedStuff = new ArrayList<>();
+
+            Result<AvailableHoursRecord> availableHoursRecordAfterDelete = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()));
+
+            // if the day path param is present
+            if (day != null) {
+                availableHoursRecordAfterDelete = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()));
+            }
+
+            for (AvailableHoursRecord av : availableHoursRecordAfterDelete) {
+                availableHoursRecord.remove(av);
+            }
+
+            for (AvailableHoursRecord avh : availableHoursRecord) {
+                deletedStuff.add(this.buildAvailableHours(avh));
+            }
+
+            return new ResponseEntity<>(deletedStuff, HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not delete AvailableHours", ex);
         }

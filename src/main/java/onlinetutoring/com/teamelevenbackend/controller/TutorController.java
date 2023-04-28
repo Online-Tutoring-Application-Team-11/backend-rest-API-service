@@ -85,7 +85,7 @@ public class TutorController {
     }
 
     @DeleteMapping(value = "/available-hours/{email}/delete")
-    public ResponseEntity<HttpStatus> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
+    public ResponseEntity<List<AvailableHours>> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
                                                            @RequestParam(required = false) Days day,
                                                            @RequestParam(required = false) LocalTime startTime) {
         try {
