@@ -5,6 +5,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -249,12 +251,13 @@ public class AppointmentService {
     }
 
     public List<Appointments> getReminderAppointments() {
+        ZoneId centralTimeZone = ZoneId.of("CST");
 
         // create a LocalDateTime object representing 15 minutes from now
-        LocalDateTime fifteenMinutesFromNow = LocalDateTime.now().plus(15, ChronoUnit.MINUTES);
+        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(centralTimeZone).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
 
         // create a LocalDateTime object representing 16 minutes from now
-        LocalDateTime sixteenMinutesFromNow = LocalDateTime.now().plus(16, ChronoUnit.MINUTES);
+        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(centralTimeZone).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
 
         List<Appointments> emailList = new ArrayList<>();
 
