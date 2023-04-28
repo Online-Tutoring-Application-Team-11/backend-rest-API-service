@@ -44,6 +44,15 @@ public class UserService {
         return userData.get(0);
     }
 
+    public String getEmailById(int id) {
+        try {
+            Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.ID.eq(id));
+            return resUser.get(0).getEmail();
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
     public Optional<AbstractAuthModel> findByEmail(String email) {
         Result<UsersRecord> result = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
         if (result.isEmpty()) {

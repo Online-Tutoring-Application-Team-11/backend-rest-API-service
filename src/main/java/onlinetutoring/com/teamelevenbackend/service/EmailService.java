@@ -13,7 +13,8 @@ public class EmailService {
     private static final String COMPANY_EMAIL = "aplusonlinetutoring11@gmail.com";
     private static final String EMAIL_SUBJECT_CO = "Appointment Confirmation for A+ Tutors";
     private static final String EMAIL_SUBJECT_CA = "Appointment Cancellation for A+ Tutors";
-    private static final String EMAIL_SUBJECT_RE = "Appointment Reminder for A+ Tutors";
+    private static final String EMAIL_SUBJECT_REM = "Appointment Reminder for A+ Tutors";
+    private static final String REGARDS = "Regards\n\nA+ Tutors";
 
     private JavaMailSender mailSender;
 
@@ -37,7 +38,7 @@ public class EmailService {
                 + " at "
                 + start.getHour() + ":" + start.getMinute()
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - if you want to cancel or reschedule.\n\n"
-                + "Regards\n\nA+ Tutors");
+                + REGARDS);
 
         mailSender.send(message);
     }
@@ -58,18 +59,16 @@ public class EmailService {
                 + start.getHour() + ":" + start.getMinute()
                 + " has been successfully cancelled."
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
-                + "Regards\n\nA+ Tutors");
+                + REGARDS);
 
         mailSender.send(message);
     }
 
     public void sendReminderEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
-        LocalDateTime reminderTime = start.minusMinutes(15);
-
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(COMPANY_EMAIL);
         message.setTo(toEmail);
-        message.setSubject(EMAIL_SUBJECT_RE);
+        message.setSubject(EMAIL_SUBJECT_REM);
 
         message.setText("Hello!\n\nThis is a reminder for your tutoring appointment for "
                 + subject
@@ -80,8 +79,8 @@ public class EmailService {
                 + " at "
                 + start.getHour() + ":" + start.getMinute()
                 + ".\n\nThe appointment will start in 15 minutes, at "
-                + reminderTime.getHour() + ":" + reminderTime.getMinute()
+                + start.getHour() + ":" + start.getMinute()
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
-                + "Regards\n\nA+ Tutors");
+                + REGARDS);
     }
 }
