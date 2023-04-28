@@ -82,5 +82,7 @@ public class EmailService {
                 + start.getHour() + ":" + start.getMinute()
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
                 + REGARDS);
+
+        mailSender.send(message);
     }
 }
