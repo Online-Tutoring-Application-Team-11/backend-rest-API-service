@@ -272,18 +272,12 @@ public class TutorService {
                 availableHoursRecordAfterDelete = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(user.getId()), AVAILABLE_HOURS.DAY_OF_WEEK.eq(day.toString()));
             }
 
-            if (availableHoursRecordAfterDelete.isEmpty()) {
-                for (AvailableHoursRecord avhr : availableHoursRecord) {
-                    deletedStuff.add(this.buildAvailableHours(avhr));
-                }
-            }
-
             for (AvailableHoursRecord av : availableHoursRecordAfterDelete) {
                 availableHoursRecord.remove(av);
             }
 
-            for (AvailableHoursRecord avhrnew : availableHoursRecord) {
-                deletedStuff.add(this.buildAvailableHours(avhrnew));
+            for (AvailableHoursRecord avh : availableHoursRecord) {
+                deletedStuff.add(this.buildAvailableHours(avh));
             }
 
             return new ResponseEntity<>(deletedStuff, HttpStatus.OK);
