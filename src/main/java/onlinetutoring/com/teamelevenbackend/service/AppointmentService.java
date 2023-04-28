@@ -34,8 +34,8 @@ import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
 @Component
 public class AppointmentService {
 
-    // Only for internal use of cleanup jobs
-    private static final ZoneId CENTRAL_TIME_ZONE = ZoneId.of("America/Chicago");
+    // Only for internal use by scheduled jobs
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     private DSLContext dslContext;
     private UserService userService;
@@ -256,10 +256,10 @@ public class AppointmentService {
     public List<AppointmentResponse> getReminderAppointments() {
 
         // create a LocalDateTime object representing 15 minutes from now
-        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
+        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(UTC).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
 
         // create a LocalDateTime object representing 16 minutes from now
-        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
+        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(UTC).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
 
         List<AppointmentResponse> emailList = new ArrayList<>();
 
@@ -281,7 +281,7 @@ public class AppointmentService {
         try {
             // delete from table
             dslContext.deleteFrom(APPOINTMENTS)
-                    .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime()))
+                    .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(UTC).toLocalDateTime()))
                     .execute();
         } catch (Exception ignored) {}
     }
