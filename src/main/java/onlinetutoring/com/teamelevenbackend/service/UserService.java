@@ -158,34 +158,37 @@ public class UserService {
     }
 
     public void updateTotalHours(UsersRecord user) {
-        if (user == null) {
-            return;
-        }
+        try {
+            if (user == null) {
+                return;
+            }
 
-        Result<AppointmentsRecord> appointmentsRecord;
+            Result<AppointmentsRecord> appointmentsRecord;
 
-        if (Boolean.TRUE.equals(user.getTutor())) {
-             appointmentsRecord = dslContext.fetch(APPOINTMENTS,
-                    APPOINTMENTS.TUTOR_ID.eq(user.getId()),
-                    APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
-        } else {
-            appointmentsRecord = dslContext.fetch(APPOINTMENTS,
-                    APPOINTMENTS.STUDENT_ID.eq(user.getId()),
-                    APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
-        }
+            if (Boolean.TRUE.equals(user.getTutor())) {
+                appointmentsRecord = dslContext.fetch(APPOINTMENTS,
+                        APPOINTMENTS.TUTOR_ID.eq(user.getId()),
+                        APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
+            } else {
+                appointmentsRecord = dslContext.fetch(APPOINTMENTS,
+                        APPOINTMENTS.STUDENT_ID.eq(user.getId()),
+                        APPOINTMENTS.END_TIME.le(LocalDateTime.now()));
+            }
 
-        if (appointmentsRecord.isEmpty()) {
-            return;
-        }
+            if (appointmentsRecord.isEmpty()) {
+                return;
+            }
 
-        int totalDuration = 0;
-        for (AppointmentsRecord app : appointmentsRecord) {
-            totalDuration += Math.toIntExact(Duration.between(app.getStartTime(), app.getEndTime()).toHours());
-        }
+            int totalDuration = 0;
+            for (AppointmentsRecord app : appointmentsRecord) {
+                totalDuration += Math.toIntExact(Duration.between(app.getStartTime(), app.getEndTime()).toHours());
+            }
 
-        dslContext.update(USERS)
-                .set(USERS.TOTAL_HOURS, totalDuration)
-                .execute();
+            dslContext.update(USERS)
+                    .set(USERS.TOTAL_HOURS, totalDuration)
+                    .where(USERS.ID.eq(user.getId()))
+                    .execute();
+        } catch (Exception ignored) {}
     }
 
     private static Users buildUser(UsersRecord usersRecord) {
