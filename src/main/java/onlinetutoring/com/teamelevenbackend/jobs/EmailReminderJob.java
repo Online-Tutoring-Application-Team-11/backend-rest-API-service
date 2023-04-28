@@ -37,9 +37,4 @@ public class EmailReminderJob {
                     userService.getEmailById(app.getStudentId()), app.getSubject(), app.getStartTime());
         }
     }
-
-    @Scheduled(fixedDelayString = "PT6H")
-    private void cleanupAppointments() {
-        appointmentService.cleanup();
-    }
 }
