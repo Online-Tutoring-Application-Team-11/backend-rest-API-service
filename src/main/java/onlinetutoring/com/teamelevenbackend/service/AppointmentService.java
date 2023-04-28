@@ -259,12 +259,11 @@ public class AppointmentService {
         List<Appointments> emailList = new ArrayList<>();
 
         try {
-            Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS);
+            Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS,
+                    APPOINTMENTS.START_TIME.between(fifteenMinutesFromNow, sixteenMinutesFromNow));
 
             for (AppointmentsRecord app : appointmentsRecords) {
-                if (app.getStartTime().isAfter(fifteenMinutesFromNow) && app.getStartTime().isBefore(sixteenMinutesFromNow)) {
-                    emailList.add(buildAppointment(app));
-                }
+                emailList.add(buildAppointment(app));
             }
 
             return emailList;

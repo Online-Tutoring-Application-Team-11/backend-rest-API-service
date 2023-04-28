@@ -33,8 +33,8 @@ public class EmailReminderJob {
             emailService.sendReminderEmail(userService.getEmailById(app.getStudentId()),
                     userService.getEmailById(app.getTutorId()), app.getSubject(), app.getStartTime());
 
-            emailService.sendReminderEmail(userService.getEmailById(app.getStudentId()),
-                    userService.getEmailById(app.getTutorId()), app.getSubject(), app.getStartTime());
+            emailService.sendReminderEmail(userService.getEmailById(app.getTutorId()),
+                    userService.getEmailById(app.getStudentId()), app.getSubject(), app.getStartTime());
         }
     }
 }
