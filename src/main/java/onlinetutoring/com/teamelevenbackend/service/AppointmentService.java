@@ -251,7 +251,7 @@ public class AppointmentService {
     }
 
     public List<Appointments> getReminderAppointments() {
-        ZoneId centralTimeZone = ZoneId.of("CST");
+        ZoneId centralTimeZone = ZoneId.of("America/Chicago");
 
         // create a LocalDateTime object representing 15 minutes from now
         LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(centralTimeZone).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
