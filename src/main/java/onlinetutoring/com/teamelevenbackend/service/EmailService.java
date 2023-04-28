@@ -40,7 +40,9 @@ public class EmailService {
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - if you want to cancel or reschedule.\n\n"
                 + REGARDS);
 
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception ignored) {}
     }
 
     public void sendCancellationEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
@@ -61,7 +63,9 @@ public class EmailService {
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
                 + REGARDS);
 
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception ignored) {}
     }
 
     public void sendReminderEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
@@ -83,6 +87,8 @@ public class EmailService {
                 + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
                 + REGARDS);
 
-        mailSender.send(message);
+        try {
+            mailSender.send(message);
+        } catch (Exception ignored) {}
     }
 }

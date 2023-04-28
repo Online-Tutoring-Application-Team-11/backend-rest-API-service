@@ -26,7 +26,7 @@ public class EmailReminderJob {
     }
 
     @Scheduled(fixedDelayString = "PT1M")
-    public void sendEmailReminders() {
+    private void sendEmailReminders() {
         List<Appointments> emailList = appointmentService.getReminderAppointments();
 
         for (Appointments app : emailList) {
@@ -36,5 +36,10 @@ public class EmailReminderJob {
             emailService.sendReminderEmail(userService.getEmailById(app.getTutorId()),
                     userService.getEmailById(app.getStudentId()), app.getSubject(), app.getStartTime());
         }
+    }
+
+    @Scheduled(fixedDelayString = "PT6H")
+    private void cleanupAppointments() {
+        appointmentService.cleanup();
     }
 }

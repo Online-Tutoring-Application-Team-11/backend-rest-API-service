@@ -34,6 +34,8 @@ import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
 @Component
 public class AppointmentService {
 
+    private static final ZoneId CENTRAL_TIME_ZONE = ZoneId.of("America/Chicago");
+
     private DSLContext dslContext;
     private UserService userService;
     private EmailService emailService;
@@ -251,13 +253,12 @@ public class AppointmentService {
     }
 
     public List<Appointments> getReminderAppointments() {
-        ZoneId centralTimeZone = ZoneId.of("America/Chicago");
 
         // create a LocalDateTime object representing 15 minutes from now
-        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(centralTimeZone).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
+        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
 
         // create a LocalDateTime object representing 16 minutes from now
-        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(centralTimeZone).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
+        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
 
         List<Appointments> emailList = new ArrayList<>();
 
@@ -273,6 +274,15 @@ public class AppointmentService {
         } catch (Exception ex) {
             return Collections.emptyList();
         }
+    }
+
+    public void cleanup() {
+        try {
+            // delete from table
+            dslContext.deleteFrom(APPOINTMENTS)
+                    .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime()))
+                    .execute();
+        } catch (Exception ignored) {}
     }
 
     private static Appointments buildAppointment(AppointmentsRecord appointmentsRecord) {
