@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Appointments;
+import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentResponse;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.AppointmentsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.TutorsRecord;
 import onlinetutoring.com.teamelevenbackend.entity.tables.records.UsersRecord;
@@ -34,7 +34,8 @@ import static onlinetutoring.com.teamelevenbackend.entity.tables.Tutors.TUTORS;
 @Component
 public class AppointmentService {
 
-    private static final ZoneId CENTRAL_TIME_ZONE = ZoneId.of("America/Chicago");
+    // Only for internal use by scheduled jobs
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     private DSLContext dslContext;
     private UserService userService;
@@ -46,7 +47,7 @@ public class AppointmentService {
         this.emailService = emailService;
     }
 
-    public ResponseEntity<List<Appointments>> listAppointmentByEmail(String email) throws SQLException {
+    public ResponseEntity<List<AppointmentResponse>> listAppointmentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -62,9 +63,9 @@ public class AppointmentService {
                 return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
             }
 
-            List<Appointments> response = new ArrayList<>();
+            List<AppointmentResponse> response = new ArrayList<>();
             for (AppointmentsRecord app : appointmentData) {
-                response.add(buildAppointment(app));
+                response.add(buildAppointmentResponse(app));
             }
 
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -73,7 +74,7 @@ public class AppointmentService {
         }
     }
 
-    public ResponseEntity<List<Appointments>> listAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
+    public ResponseEntity<List<AppointmentResponse>> listAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
         if (StringUtils.isEmpty(studentEmail) || StringUtils.isEmpty(tutorEmail)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -90,9 +91,9 @@ public class AppointmentService {
                 return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
             }
 
-            List<Appointments> response = new ArrayList<>();
+            List<AppointmentResponse> response = new ArrayList<>();
             for (AppointmentsRecord app : appointmentData) {
-                response.add(buildAppointment(app));
+                response.add(buildAppointmentResponse(app));
             }
 
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -101,7 +102,7 @@ public class AppointmentService {
         }
     }
 
-    public ResponseEntity<Appointments> insertIntoAppointments(AppointmentRequest appointmentRequest) throws SQLException {
+    public ResponseEntity<AppointmentResponse> insertIntoAppointments(AppointmentRequest appointmentRequest) throws SQLException {
         if (StringUtils.isEmpty(appointmentRequest.getStudentEmail())
                 || StringUtils.isEmpty(appointmentRequest.getTutorEmail())
                 || StringUtils.isEmpty(appointmentRequest.getSubject())
@@ -143,7 +144,7 @@ public class AppointmentService {
             emailService.sendConfirmationEmail(appointmentRequest.getStudentEmail(), appointmentRequest.getTutorEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
             emailService.sendConfirmationEmail(appointmentRequest.getTutorEmail(), appointmentRequest.getStudentEmail(), appointmentRequest.getSubject(), appointmentRequest.getRequestedStartTime());
 
-            return new ResponseEntity<>(buildAppointment(appointment.get(0)), HttpStatus.OK);
+            return new ResponseEntity<>(buildAppointmentResponse(appointment.get(0)), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not insert data into appointment", ex);
         }
@@ -252,22 +253,22 @@ public class AppointmentService {
         }
     }
 
-    public List<Appointments> getReminderAppointments() {
+    public List<AppointmentResponse> getReminderAppointments() {
 
         // create a LocalDateTime object representing 15 minutes from now
-        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
+        LocalDateTime fifteenMinutesFromNow = ZonedDateTime.now(UTC).toLocalDateTime().plus(15, ChronoUnit.MINUTES);
 
         // create a LocalDateTime object representing 16 minutes from now
-        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
+        LocalDateTime sixteenMinutesFromNow = ZonedDateTime.now(UTC).toLocalDateTime().plus(16, ChronoUnit.MINUTES);
 
-        List<Appointments> emailList = new ArrayList<>();
+        List<AppointmentResponse> emailList = new ArrayList<>();
 
         try {
             Result<AppointmentsRecord> appointmentsRecords = dslContext.fetch(APPOINTMENTS,
                     APPOINTMENTS.START_TIME.between(fifteenMinutesFromNow, sixteenMinutesFromNow));
 
             for (AppointmentsRecord app : appointmentsRecords) {
-                emailList.add(buildAppointment(app));
+                emailList.add(buildAppointmentResponse(app));
             }
 
             return emailList;
@@ -280,19 +281,21 @@ public class AppointmentService {
         try {
             // delete from table
             dslContext.deleteFrom(APPOINTMENTS)
-                    .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(CENTRAL_TIME_ZONE).toLocalDateTime()))
+                    .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(UTC).toLocalDateTime()))
                     .execute();
         } catch (Exception ignored) {}
     }
 
-    private static Appointments buildAppointment(AppointmentsRecord appointmentsRecord) {
-        Appointments response = new Appointments();
+    private AppointmentResponse buildAppointmentResponse(AppointmentsRecord appointmentsRecord) {
+        AppointmentResponse response = new AppointmentResponse();
 
         response.setTutorId(appointmentsRecord.getTutorId());
         response.setStudentId(appointmentsRecord.getStudentId());
         response.setStartTime(appointmentsRecord.getStartTime());
         response.setEndTime(appointmentsRecord.getEndTime());
         response.setSubject(appointmentsRecord.getSubject());
+        response.setTutorEmail(userService.getEmailById(appointmentsRecord.getTutorId()));
+        response.setStudentEmail(userService.getEmailById(appointmentsRecord.getStudentId()));
 
         return response;
     }

@@ -1,7 +1,7 @@
 package onlinetutoring.com.teamelevenbackend.controller;
 
 import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentRequest;
-import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Appointments;
+import onlinetutoring.com.teamelevenbackend.controller.models.AppointmentResponse;
 import onlinetutoring.com.teamelevenbackend.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +36,7 @@ public class AppointmentController {
     }
 
     @GetMapping(value = "/list/{email}")
-    public ResponseEntity<List<Appointments>> listAppointmentsByEmail(@PathVariable("email") String email) {
+    public ResponseEntity<List<AppointmentResponse>> listAppointmentsByEmail(@PathVariable("email") String email) {
         try {
             return appointmentService.listAppointmentByEmail(email);
         } catch (Exception ex) {
@@ -45,7 +45,7 @@ public class AppointmentController {
     }
 
     @GetMapping(value = "/list")
-    public ResponseEntity<List<Appointments>> getAppointment(@RequestParam String studentEmail,
+    public ResponseEntity<List<AppointmentResponse>> getAppointment(@RequestParam String studentEmail,
                                                              @RequestParam String tutorEmail) {
         try {
             return appointmentService.listAppointmentByEmail(studentEmail, tutorEmail);
@@ -55,7 +55,7 @@ public class AppointmentController {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<Appointments> insertIntoAppointment(@RequestBody AppointmentRequest appointmentRequest) {
+    public ResponseEntity<AppointmentResponse> insertIntoAppointment(@RequestBody AppointmentRequest appointmentRequest) {
         try {
             return appointmentService.insertIntoAppointments(appointmentRequest);
         } catch (Exception ex) {
