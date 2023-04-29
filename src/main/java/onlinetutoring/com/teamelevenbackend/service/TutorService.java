@@ -45,7 +45,7 @@ public class TutorService {
             Result<TutorsRecord> allTutors;
             if (StringUtils.isEmpty(subject)) {
                 // fetching all tutors
-                allTutors = dslContext.fetch(TUTORS, TUTORS.ID.ge(0));
+                allTutors = dslContext.fetch(TUTORS);
             } else {
                 // fetching all tutors by a subject
                 allTutors = dslContext.fetch(TUTORS, TUTORS.SUBJECTS.contains((new String[] {subject})));
@@ -55,7 +55,8 @@ public class TutorService {
 
             for (TutorsRecord tutor : allTutors) {
                 UsersRecord resUser = dslContext.fetch(USERS, USERS.ID.eq(tutor.getId())).get(0);
-                response.add(buildTutorUser(resUser, tutor));
+                List<AvailableHoursRecord> availableHoursRecord = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(resUser.getId()));
+                response.add(buildTutorUser(resUser, tutor, availableHoursRecord));
             }
 
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -106,11 +107,12 @@ public class TutorService {
             UsersRecord usersRecord = userService.get(email);
 
             Result<TutorsRecord> tutorData = dslContext.fetch(TUTORS, TUTORS.ID.eq(usersRecord.getId()));
+            Result<AvailableHoursRecord> availableHoursRecords = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(tutorData.get(0).getId()));
             if (tutorData.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(this.buildTutorUser(usersRecord, tutorData.get(0)), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildTutorUser(usersRecord, tutorData.get(0), availableHoursRecords), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not query data", ex);
         }
@@ -131,8 +133,9 @@ public class TutorService {
                     .execute();
 
             TutorsRecord resTutor = dslContext.fetch(TUTORS, TUTORS.ID.eq(user.getId())).get(0);
+            Result<AvailableHoursRecord> availableHoursRecords = dslContext.fetch(AVAILABLE_HOURS, AVAILABLE_HOURS.TUTOR_ID.eq(resTutor.getId()));
 
-            return new ResponseEntity<>(this.buildTutorUser(user, resTutor), HttpStatus.OK);
+            return new ResponseEntity<>(this.buildTutorUser(user, resTutor, availableHoursRecords), HttpStatus.OK);
         } catch (Exception ex) {
             throw new SQLException("Could not update Tutor", ex);
         }
@@ -286,7 +289,7 @@ public class TutorService {
         }
     }
 
-    private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord) {
+    private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord, List<AvailableHoursRecord> availableHoursRecordList) {
         TutorUser response = new TutorUser();
 
         // user data
@@ -304,6 +307,13 @@ public class TutorService {
 
         // tutor data
         response.setSubjects(Arrays.asList(tutorsRecord.getSubjects()));
+
+        // set available hours
+        List<AvailableHours> availableHours = new ArrayList<>();
+        for (AvailableHoursRecord av: availableHoursRecordList) {
+            availableHours.add(this.buildAvailableHours(av));
+        }
+        response.setAvailableHours(availableHours);
 
         return response;
     }
