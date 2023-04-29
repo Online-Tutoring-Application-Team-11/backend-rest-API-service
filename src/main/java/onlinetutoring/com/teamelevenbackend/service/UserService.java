@@ -181,7 +181,8 @@ public class UserService {
 
             int totalDuration = 0;
             for (AppointmentsRecord app : appointmentsRecord) {
-                totalDuration += Math.toIntExact(Duration.between(app.getStartTime(), app.getEndTime()).toHours());
+                long tempDuration = Duration.between(app.getStartTime(), app.getEndTime()).toMinutes();
+                totalDuration += (int) Math.ceil(tempDuration/60.0);
             }
 
             dslContext.update(USERS)
