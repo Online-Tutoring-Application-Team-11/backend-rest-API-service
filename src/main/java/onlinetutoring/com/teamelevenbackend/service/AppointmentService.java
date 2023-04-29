@@ -282,6 +282,7 @@ public class AppointmentService {
             // delete from table
             dslContext.deleteFrom(APPOINTMENTS)
                     .where(APPOINTMENTS.END_TIME.le(ZonedDateTime.now(UTC).toLocalDateTime()))
+                    .and(APPOINTMENTS.TUTOR_ID.le(0)) // this is a bug introduced till we can find a fix for calculating total-hours in a better way
                     .execute();
         } catch (Exception ignored) {}
     }
