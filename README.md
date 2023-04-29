@@ -14,7 +14,7 @@ Credentials -
 * host-name: `dev-db.cnyraed9rw6a.us-east-2.rds.amazonaws.com`
 * port: `5432`
 * username: `crud`
-* password: `crudpass`
+* password: `CONTACT-ADMIN-FOR-PASSWORD`
 
 ### Deployment -
 The backend is deployed using [railway](https://railway.app/dashboard)
