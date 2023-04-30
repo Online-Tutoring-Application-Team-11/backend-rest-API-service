@@ -5,6 +5,8 @@ import onlinetutoring.com.teamelevenbackend.controller.models.auth.ChangePasswor
 import onlinetutoring.com.teamelevenbackend.entity.tables.pojos.Users;
 import onlinetutoring.com.teamelevenbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,7 @@ import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PR
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.DELETE, RequestMethod.PUT})
+@CacheConfig(cacheNames = {"tutors"})
 public class UserController {
 
     private UserService userService;
@@ -33,6 +36,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/delete/{email}")
+    @CacheEvict
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable(value = "email", required = false) String email) {
         try {
             return userService.deleteUser(email);
@@ -42,6 +46,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/update-profile")
+    @CacheEvict
     public ResponseEntity<Users> updateProfile(@RequestBody UpdateProfileRequest updateProfileRequest) {
         try {
             return userService.updateProfile(updateProfileRequest);
