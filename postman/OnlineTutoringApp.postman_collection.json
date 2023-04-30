@@ -1,0 +1,744 @@
+{
+	"info": {
+		"_postman_id": "ae5d418c-d22e-46cc-af03-e2c149ea954a",
+		"name": "OnlineTutoringApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12777487"
+	},
+	"item": [
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Get Student By Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/students/get/{{email}}",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"students",
+								"get",
+								"{{email}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"anirudh.umarji@utdallas.edu\",\n    \"year\": 4,\n    \"favouriteTutorIds\": [2, 7]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/students/update",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"students",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email2}}\",\n    \"password\": \"password\",\n    \"fName\": \"Sudeep\",\n    \"lName\": \"Sab\",\n    \"tutor\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/auth/signup",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Success",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/auth/login",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Failure",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"wrongpass\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/auth/login",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tutors",
+			"item": [
+				{
+					"name": "Get All Tutors",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/get/all",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"get",
+								"all"
+							],
+							"query": [
+								{
+									"key": "subject",
+									"value": "Calculus",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tutor By Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/get/{{email2}}",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"get",
+								"{{email2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tutors",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email2}}\",\n    \"subjects\": [\"Calculus\", \"Pottery\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/update",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Hours",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/get/{{email2}}/available-hours",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"get",
+								"{{email2}}",
+								"available-hours"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify Available Hours",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email2}}\",\n    \"startTime\": \"01:00:00\",\n    \"endTime\": \"23:00:00\",\n    \"dayOfWeek\": \"FRIDAY\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/available-hours/modify",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"available-hours",
+								"modify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Available Hours",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/tutors/available-hours/{{email2}}/delete?day=FRIDAY",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"tutors",
+								"available-hours",
+								"{{email2}}",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "day",
+									"value": "FRIDAY"
+								},
+								{
+									"key": "startTime",
+									"value": "09:00:00",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Get All Appointments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/appointments/list/{{email2}}",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"appointments",
+								"list",
+								"{{email2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointment By Params",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/appointments/list?studentEmail={{email}}&tutorEmail={{email2}}",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"appointments",
+								"list"
+							],
+							"query": [
+								{
+									"key": "studentEmail",
+									"value": "{{email}}"
+								},
+								{
+									"key": "tutorEmail",
+									"value": "{{email2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Appointment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentEmail\": \"{{email}}\",\n    \"tutorEmail\": \"{{email2}}\",\n    \"subject\": \"Calculus\",\n    \"requestedStartTime\": \"2023-04-28T09:00:00\",\n    \"requestedEndTime\": \"2023-04-28T10:30:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/appointments/create",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"appointments",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Appointments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentEmail\": \"{{email}}\",\n    \"tutorEmail\": \"{{email2}}\",\n    \"subject\": \"Calculus\",\n    \"requestedStartTime\": \"2023-04-27T04:00:00\",\n    \"requestedEndTime\": \"2023-04-27T06:00:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/appointments/delete",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"appointments",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Delete Users By Email",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ota-basepath}}/users/delete/{{email}}",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"users",
+								"delete",
+								"{{email}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sudeep.sab@gmail.com\",\n    \"totalHours\": 0,\n    \"profilePic\": null,\n    \"aboutMe\": \"My name is Sudip and I am a CS Major\",\n    \"fName\": \"Suddep\",\n    \"lName\": \"Sabbineni\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/users/update-profile",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"users",
+								"update-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{auth-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"anirudh.umarji@utdallas.edu\",\n    \"password\": \"password\",\n    \"newPassword\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ota-basepath}}/users/change-password",
+							"host": [
+								"{{ota-basepath}}"
+							],
+							"path": [
+								"users",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Version",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "User",
+						"value": "{{email}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{ota-basepath}}/version",
+					"host": [
+						"{{ota-basepath}}"
+					],
+					"path": [
+						"version"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth-token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "email",
+			"value": "anirudh.umarji@utdallas.edu"
+		},
+		{
+			"key": "email2",
+			"value": "sudeep.sab@gmail.com"
+		},
+		{
+			"key": "auth-token",
+			"value": "abcd"
+		}
+	]
+}
