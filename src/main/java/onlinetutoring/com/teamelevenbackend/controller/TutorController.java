@@ -63,7 +63,7 @@ public class TutorController {
     }
 
     @PutMapping(value = "/update")
-    @CacheEvict(allEntries = true)
+    @CacheEvict
     public ResponseEntity<TutorUser> updateTutor(@RequestBody UpdateTutorRequest updateTutorRequest) {
         try {
             return tutorService.updateTutor(updateTutorRequest);
@@ -82,7 +82,7 @@ public class TutorController {
     }
 
     @PutMapping(value = "/available-hours/modify")
-    @CacheEvict(allEntries = true)
+    @CacheEvict
     public ResponseEntity<List<AvailableHours>> modifyAvailableHours(@RequestBody ModifyAvailableHours modifyAvailableHours) {
         try {
             return tutorService.modifyAvailableHours(modifyAvailableHours);
@@ -92,7 +92,7 @@ public class TutorController {
     }
 
     @DeleteMapping(value = "/available-hours/{email}/delete")
-    @CacheEvict(allEntries = true)
+    @CacheEvict
     public ResponseEntity<List<AvailableHours>> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
                                                            @RequestParam(required = false) Days day,
                                                            @RequestParam(required = false) LocalTime startTime) {
