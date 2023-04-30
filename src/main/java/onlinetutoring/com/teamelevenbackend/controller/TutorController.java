@@ -7,6 +7,9 @@ import onlinetutoring.com.teamelevenbackend.models.TutorUser;
 import onlinetutoring.com.teamelevenbackend.models.enums.Days;
 import onlinetutoring.com.teamelevenbackend.service.TutorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,6 +34,7 @@ import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PR
 @RestController
 @RequestMapping("/tutors")
 @CrossOrigin(origins = {BASE_PRODUCTION, BASE_LOCAL}, methods = {RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE})
+@CacheConfig(cacheNames = {"tutors"})
 public class TutorController {
 
     private TutorService tutorService;
@@ -40,6 +44,7 @@ public class TutorController {
     }
 
     @GetMapping(value = "/get/all")
+    @Cacheable
     public ResponseEntity<List<TutorUser>> getTutors(@RequestParam(required = false) String subject) {
         try {
             return tutorService.getAllTutors(subject);
@@ -58,6 +63,7 @@ public class TutorController {
     }
 
     @PutMapping(value = "/update")
+    @CacheEvict(allEntries = true)
     public ResponseEntity<TutorUser> updateTutor(@RequestBody UpdateTutorRequest updateTutorRequest) {
         try {
             return tutorService.updateTutor(updateTutorRequest);
@@ -76,6 +82,7 @@ public class TutorController {
     }
 
     @PutMapping(value = "/available-hours/modify")
+    @CacheEvict(allEntries = true)
     public ResponseEntity<List<AvailableHours>> modifyAvailableHours(@RequestBody ModifyAvailableHours modifyAvailableHours) {
         try {
             return tutorService.modifyAvailableHours(modifyAvailableHours);
@@ -85,6 +92,7 @@ public class TutorController {
     }
 
     @DeleteMapping(value = "/available-hours/{email}/delete")
+    @CacheEvict(allEntries = true)
     public ResponseEntity<List<AvailableHours>> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
                                                            @RequestParam(required = false) Days day,
                                                            @RequestParam(required = false) LocalTime startTime) {
