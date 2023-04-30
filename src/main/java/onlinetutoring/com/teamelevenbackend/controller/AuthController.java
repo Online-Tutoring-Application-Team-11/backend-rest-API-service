@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login")
-    @CacheEvict
+    @CacheEvict(allEntries = true)
     public ResponseEntity<UserWithToken> login(@RequestBody LoginRequest loginRequest) {
         try {
             return authService.login(loginRequest);

@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/delete/{email}")
-    @CacheEvict
+    @CacheEvict(allEntries = true)
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable(value = "email", required = false) String email) {
         try {
             return userService.deleteUser(email);
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/update-profile")
-    @CacheEvict
+    @CacheEvict(allEntries = true)
     public ResponseEntity<Users> updateProfile(@RequestBody UpdateProfileRequest updateProfileRequest) {
         try {
             return userService.updateProfile(updateProfileRequest);
