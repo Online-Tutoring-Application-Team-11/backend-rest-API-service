@@ -1,0 +1,12 @@
+{
+  "id": "2877ab62-7ebe-4702-bceb-d8fce9586118",
+  "name": "PRODUCTION",
+  "values": [
+    {
+      "key": "ota-basepath",
+      "value": "https://online-tutoring-backend.up.railway.app",
+      "enabled": true,
+      "type": "default"
+    }
+  ]
+}

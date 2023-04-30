@@ -1,0 +1,12 @@
+{
+  "id": "ea5013d4-ceec-4e08-9227-228b429fe776",
+  "name": "LOCAL",
+  "values": [
+    {
+      "key": "ota-basepath",
+      "value": "http://localhost:8080",
+      "enabled": true,
+      "type": "default"
+    }
+  ]
+}
