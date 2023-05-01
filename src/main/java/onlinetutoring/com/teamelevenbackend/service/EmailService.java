@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 @Service
 public class EmailService {
 
-    private static final String COMPANY_EMAIL = "aplusonlinetutoring11@gmail.com";
-    private static final String EMAIL_SUBJECT_CO = "Appointment Confirmation for A+ Tutors";
-    private static final String EMAIL_SUBJECT_CA = "Appointment Cancellation for A+ Tutors";
-    private static final String EMAIL_SUBJECT_REM = "Appointment Reminder for A+ Tutors";
-    private static final String REGARDS = "Regards\n\nA+ Tutors";
+    private static final String COMPANY_EMAIL_ID = "aplusonlinetutoring11@gmail.com";
+    private static final String EMAIL_SUBJECT_CONFIRM = "Appointment Confirmation from A+ Tutors";
+    private static final String EMAIL_SUBJECT_CANCEL = "Appointment Cancellation from A+ Tutors";
+    private static final String EMAIL_SUBJECT_REMAINDER = "Appointment Reminder from A+ Tutors";
+    private static final String END_REGARDS = "Regards\n\nA+ Tutors";
+
+    private static final String WEBSITE = "https://online-tutoring-team-eleven.vercel.app";
 
     private JavaMailSender mailSender;
 
@@ -25,20 +27,21 @@ public class EmailService {
 
     public void sendConfirmationEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(COMPANY_EMAIL);
+        message.setFrom(COMPANY_EMAIL_ID);
         message.setTo(toEmail);
-        message.setSubject(EMAIL_SUBJECT_CO);
+        message.setSubject(EMAIL_SUBJECT_CONFIRM);
 
-        message.setText("Hello!\n\nYour tutoring appointment for "
-                + subject
-                + " is confirmed with "
-                + fromEmail
-                + " on "
-                + start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear()
-                + " at "
-                + start.getHour() + ":" + start.getMinute()
-                + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - if you want to cancel or reschedule.\n\n"
-                + REGARDS);
+        message.setText("Hello!\n\nYour tutoring appointment with A+ Tutors for " +
+                subject +
+                " is confirmed with tutor " +
+                fromEmail +
+                " on " +
+                start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear() +
+                " at " +
+                start.getHour() + ":" + start.getMinute() + "hours." +
+                "\n\nPlease visit our website @ " + WEBSITE +
+                " in case you want to cancel or reschedule.\n\n" +
+                END_REGARDS);
 
         try {
             mailSender.send(message);
@@ -47,21 +50,21 @@ public class EmailService {
 
     public void sendCancellationEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(COMPANY_EMAIL);
+        message.setFrom(COMPANY_EMAIL_ID);
         message.setTo(toEmail);
-        message.setSubject(EMAIL_SUBJECT_CA);
+        message.setSubject(EMAIL_SUBJECT_CANCEL);
 
-        message.setText("Hello!\n\nYour tutoring appointment for "
-                + subject
-                + " with "
-                + fromEmail
-                + " on "
-                + start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear()
-                + " at "
-                + start.getHour() + ":" + start.getMinute()
-                + " has been successfully cancelled."
-                + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
-                + REGARDS);
+        message.setText("Hello!\n\nYour tutoring appointment with A+ Tutors for " +
+                subject +
+                " with tutor " +
+                fromEmail +
+                " on " +
+                start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear() +
+                " at " +
+                start.getHour() + ":" + start.getMinute() + " hours " +
+                " has been cancelled successfully." +
+                "\n\nPlease visit our website @ + " + WEBSITE +" - to schedule a new appointment.\n\n" +
+                END_REGARDS);
 
         try {
             mailSender.send(message);
@@ -70,22 +73,23 @@ public class EmailService {
 
     public void sendReminderEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(COMPANY_EMAIL);
+        message.setFrom(COMPANY_EMAIL_ID);
         message.setTo(toEmail);
-        message.setSubject(EMAIL_SUBJECT_REM);
+        message.setSubject(EMAIL_SUBJECT_REMAINDER);
 
-        message.setText("Hello!\n\nThis is a reminder for your tutoring appointment for "
-                + subject
-                + " with "
-                + fromEmail
-                + " on "
-                + start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear()
-                + " at "
-                + start.getHour() + ":" + start.getMinute()
-                + ".\n\nThe appointment will start in 15 minutes, at "
-                + start.getHour() + ":" + start.getMinute()
-                + "\n\nPlease visit our website - https://online-tutoring-team-eleven.vercel.app - to schedule a new appointment.\n\n"
-                + REGARDS);
+        message.setText("Hello!\n\nThis is a reminder regarding your upcoming" +
+                " tutoring appointment with A+ Tutors for " +
+                subject +
+                " with tutor " +
+                fromEmail +
+                " on " +
+                start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear() +
+                " at " +
+                start.getHour() + ":" + start.getMinute() + " hours." +
+                "\n\nThe appointment will start in 15 minutes, at " +
+                start.getHour() + ":" + start.getMinute() + " hours." +
+                "\n\nPlease visit our website @ " + WEBSITE + " - to schedule a new appointment.\n\n" +
+                END_REGARDS);
 
         try {
             mailSender.send(message);
