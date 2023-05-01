@@ -16,6 +16,8 @@ public class EmailService {
     private static final String EMAIL_SUBJECT_REMAINDER = "Appointment Reminder from A+ Tutors";
     private static final String END_REGARDS = "Regards\n\nA+ Tutors";
 
+    private static final String EMAIL_LINE_1 = "Hello!\n\nYour tutoring appointment " +
+                                                "with A+ Tutors for ";
     private static final String WEBSITE = "https://online-tutoring-team-eleven.vercel.app";
 
     private JavaMailSender mailSender;
@@ -31,7 +33,7 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject(EMAIL_SUBJECT_CONFIRM);
 
-        message.setText("Hello!\n\nYour tutoring appointment with A+ Tutors for " +
+        message.setText( EMAIL_LINE_1 +
                 subject +
                 " is confirmed with tutor " +
                 fromEmail +
@@ -54,7 +56,7 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject(EMAIL_SUBJECT_CANCEL);
 
-        message.setText("Hello!\n\nYour tutoring appointment with A+ Tutors for " +
+        message.setText(EMAIL_LINE_1 +
                 subject +
                 " with tutor " +
                 fromEmail +
