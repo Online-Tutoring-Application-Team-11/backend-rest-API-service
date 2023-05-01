@@ -11,17 +11,17 @@ Backend Rest API Service Powered by Java and Spring for the Online Tutoring Appl
 The Application uses Postgres DB and is hosted on AWS
 
 Credentials -
-* host-name: `dev-db.cnyraed9rw6a.us-east-2.rds.amazonaws.com`
-* port: `5432`
-* username: `crud`
-* password: `CONTACT-ADMIN-FOR-PASSWORD`
+* host-name: `CONTACT-ADMIN`
+* port: `CONTACT-ADMIN`
+* username: `CONTACT-ADMIN`
+* password: `CONTACT-ADMIN`
 
 ### Deployment -
 The backend is deployed using [railway](https://railway.app/dashboard)
 
 #### NEW ENVIRONMENTS - 
 
-- production - `https://online-tutoring-backend.up.railway.app`
+- production - `CONTACT-ADMIN`
 - localhost - `http://localhost:8080`
 
 
