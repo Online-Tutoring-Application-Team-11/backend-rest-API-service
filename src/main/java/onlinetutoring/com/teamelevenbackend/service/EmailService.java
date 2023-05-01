@@ -20,6 +20,8 @@ public class EmailService {
                                                 "with A+ Tutors for ";
     private static final String WEBSITE = "https://online-tutoring-team-eleven.vercel.app";
 
+    private static final String END_LINE = "\n\nHAPPY LEARNING!!";
+
     private JavaMailSender mailSender;
 
     @Autowired
@@ -43,7 +45,9 @@ public class EmailService {
                 start.getHour() + ":" + start.getMinute() + "hours." +
                 "\n\nPlease visit our website @ " + WEBSITE +
                 " in case you want to cancel or reschedule.\n\n" +
-                END_REGARDS);
+                END_REGARDS +
+                END_LINE
+        );
 
         try {
             mailSender.send(message);
@@ -66,7 +70,9 @@ public class EmailService {
                 start.getHour() + ":" + start.getMinute() + " hours " +
                 " has been cancelled successfully." +
                 "\n\nPlease visit our website @ + " + WEBSITE +" - to schedule a new appointment.\n\n" +
-                END_REGARDS);
+                END_REGARDS +
+                END_LINE
+        );
 
         try {
             mailSender.send(message);
@@ -90,8 +96,10 @@ public class EmailService {
                 start.getHour() + ":" + start.getMinute() + " hours." +
                 "\n\nThe appointment will start in 15 minutes, at " +
                 start.getHour() + ":" + start.getMinute() + " hours." +
-                "\n\nPlease visit our website @ " + WEBSITE + " - to schedule a new appointment.\n\n" +
-                END_REGARDS);
+                "\n\nPlease visit our website @ " + WEBSITE + " - to join your appointment.\n\n" +
+                END_REGARDS +
+                END_LINE
+        );
 
         try {
             mailSender.send(message);
