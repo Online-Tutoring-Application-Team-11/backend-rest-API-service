@@ -124,9 +124,9 @@
 
                             <jdbc>
                                 <driver>org.postgresql.Driver</driver>
-                                <url>jdbc:postgresql://dev-db.cnyraed9rw6a.us-east-2.rds.amazonaws.com:5432/postgres</url>
-                                <user>postgres</user>
-                                <password>PassPostgresSQL</password>
+                                <url>ASK-ADMIN</url>
+                                <user>ASK-ADMIN</user>
+                                <password>ASK-ADMIN</password>
                             </jdbc>
 
                             <generator>
