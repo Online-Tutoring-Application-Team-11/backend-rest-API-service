@@ -29,6 +29,14 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    /**
+     * Send confirmation email to the users
+     *
+     * @param toEmail The email address to send to
+     * @param fromEmail The email address of A+ tutors
+     * @param subject The subject stating confirmation
+     * @param start The start time of the appointment
+     */
     public void sendConfirmationEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(COMPANY_EMAIL_ID);
@@ -54,6 +62,14 @@ public class EmailService {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Send cancellation email to the users
+     *
+     * @param toEmail The email address to email send to
+     * @param fromEmail The email address of A+ tutors
+     * @param subject The subject stating cancellation
+     * @param start The start time of the appointment
+     */
     public void sendCancellationEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(COMPANY_EMAIL_ID);
@@ -79,6 +95,14 @@ public class EmailService {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Send confirmation mail to users
+     *
+     * @param toEmail The email address to email send to
+     * @param fromEmail The email address of A+ tutors
+     * @param subject The subject stating reminder
+     * @param start The start time of the appointment
+     */
     public void sendReminderEmail(String toEmail, String fromEmail, String subject, LocalDateTime start) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(COMPANY_EMAIL_ID);

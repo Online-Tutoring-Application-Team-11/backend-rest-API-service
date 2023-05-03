@@ -40,6 +40,13 @@ public class TutorService {
         this.dslContext = dslContext;
     }
 
+    /**
+     * All the tutors are returned based on the chosen subject
+     *
+     * @param subject The subject chosen
+     * @return The list of all tutors
+     * @throws SQLException All the tutors couldn't be fetched.
+     */
     public ResponseEntity<List<TutorUser>> getAllTutors(String subject) throws SQLException {
         try {
             Result<TutorsRecord> allTutors;
@@ -65,6 +72,12 @@ public class TutorService {
         }
     }
 
+    /**
+     * Validates to confirm that it is a tutor
+     *
+     * @param tutorIds The list of Tutor Ids given
+     * @return The list of all the Ids that are tutors
+     */
     public List<Integer> validateIsTutor(List<Integer> tutorIds) {
         if (CollectionUtils.isEmpty(tutorIds)) {
             return Collections.emptyList();
@@ -81,6 +94,14 @@ public class TutorService {
         return finalTutorList;
     }
 
+    /**
+     * The tutors are inserted using the id and subjects taught
+     *
+     * @param id The id of the tutor
+     * @param subjects The subjects taught
+     * @return The result of the attempt
+     * @throws SQLException The tutor couldn't be inserted
+     */
     public boolean insertIntoTutors(int id, List<String> subjects) throws SQLException {
         try {
             dslContext.insertInto(TUTORS)
@@ -98,6 +119,13 @@ public class TutorService {
         }
     }
 
+    /**
+     * Get the tutor using the email
+     *
+     * @param email The email of the tutor
+     * @return The tutor
+     * @throws SQLException Could not query the data
+     */
     public ResponseEntity<TutorUser> getTutorByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -118,6 +146,13 @@ public class TutorService {
         }
     }
 
+    /**
+     * Update the tutor using the UpdateTutorRequest
+     *
+     * @param updateTutorRequest The update tutor request
+     * @return The updated tutor
+     * @throws SQLException The tutor couldn't be updated
+     */
     public ResponseEntity<TutorUser> updateTutor(UpdateTutorRequest updateTutorRequest) throws SQLException {
         if (StringUtils.isEmpty(updateTutorRequest.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -141,6 +176,13 @@ public class TutorService {
         }
     }
 
+    /**
+     * Get the available hours of the tutor using email
+     *
+     * @param email The email of the tutor
+     * @return The available hours of the tutor
+     * @throws SQLException The available hours couldn't be fetched
+     */
     public ResponseEntity<List<AvailableHours>> getAvailableHours(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -171,6 +213,13 @@ public class TutorService {
         }
     }
 
+    /**
+     * Modify the available hours of the tutor using the given input
+     *
+     * @param modifyAvailableHours To change the current available hours
+     * @return The result of the modification
+     * @throws SQLException The available hours of the tutor couldn't be modified
+     */
     public ResponseEntity<List<AvailableHours>> modifyAvailableHours(ModifyAvailableHours modifyAvailableHours) throws SQLException {
         if (StringUtils.isEmpty(modifyAvailableHours.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -210,6 +259,13 @@ public class TutorService {
         }
     }
 
+    /**
+     * Checking whether the available hours can be inserted for a user
+     *
+     * @param modifyAvailableHours The requested changes to the available hours
+     * @param availableHoursRecords The current available hours
+     * @return If it is possible to insert the available hours
+     */
     private static boolean verifyAvailableHours(ModifyAvailableHours modifyAvailableHours, Result<AvailableHoursRecord> availableHoursRecords) {
         LocalTime reqStartTime = modifyAvailableHours.getStartTime();
         LocalTime reqEndTime = modifyAvailableHours.getEndTime();
@@ -227,6 +283,15 @@ public class TutorService {
         return true;
     }
 
+    /**
+     * Delete the available hours using email, say and start time
+     *
+     * @param email The email of the tutor
+     * @param day The day for which it needs to be deleted
+     * @param startTime The start time of the available hours to be deleted
+     * @return The result after the deletion
+     * @throws SQLException The available hours couldn't be deleted
+     */
     public ResponseEntity<List<AvailableHours>> deleteAvailableHours(String email, Days day, LocalTime startTime) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -289,6 +354,14 @@ public class TutorService {
         }
     }
 
+    /**
+     * Building the tutor using the record and available hours
+     *
+     * @param usersRecord The user record for the tutor
+     * @param tutorsRecord The tutor record for the tutor
+     * @param availableHoursRecordList The available hours of the tutor
+     * @return The tutor
+     */
     private TutorUser buildTutorUser(UsersRecord usersRecord, TutorsRecord tutorsRecord, List<AvailableHoursRecord> availableHoursRecordList) {
         TutorUser response = new TutorUser();
 
@@ -318,6 +391,12 @@ public class TutorService {
         return response;
     }
 
+    /**
+     * Building the available hours
+     *
+     * @param availableHoursRecord The available hours record
+     * @return The available hours
+     */
     private AvailableHours buildAvailableHours(AvailableHoursRecord availableHoursRecord) {
         AvailableHours response = new AvailableHours();
 

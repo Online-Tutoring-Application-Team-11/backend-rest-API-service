@@ -47,6 +47,13 @@ public class AppointmentService {
         this.emailService = emailService;
     }
 
+    /**
+     * Get Appointments using the email of user
+     *
+     * @param email The email of the user
+     * @return The appointments associated with the email
+     * @throws SQLException Couldn't query the data
+     */
     public ResponseEntity<List<AppointmentResponse>> listAppointmentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -74,6 +81,14 @@ public class AppointmentService {
         }
     }
 
+    /**
+     * Get the appointments using the emails of the users
+     *
+     * @param studentEmail The email of the student
+     * @param tutorEmail The email of the tutor
+     * @return The appointments of the users
+     * @throws SQLException Couldn't query the data
+     */
     public ResponseEntity<List<AppointmentResponse>> listAppointmentByEmail(String studentEmail, String tutorEmail) throws SQLException {
         if (StringUtils.isEmpty(studentEmail) || StringUtils.isEmpty(tutorEmail)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -102,6 +117,13 @@ public class AppointmentService {
         }
     }
 
+    /**
+     * Insertion into appointments using the AppointmentRequest
+     *
+     * @param appointmentRequest The appointment request
+     * @return The resulting appointment response
+     * @throws SQLException The data couldn't be inserted into appointment
+     */
     public ResponseEntity<AppointmentResponse> insertIntoAppointments(AppointmentRequest appointmentRequest) throws SQLException {
         if (StringUtils.isEmpty(appointmentRequest.getStudentEmail())
                 || StringUtils.isEmpty(appointmentRequest.getTutorEmail())
@@ -150,6 +172,14 @@ public class AppointmentService {
         }
     }
 
+    /**
+     * Checking if the tutor is available for an appointment
+     *
+     * @param tutorId The id of the tutor
+     * @param requestedStartTime The requested start time
+     * @param requestedEndTime The requested end time
+     * @return The result whether the tutor is available
+     */
     public boolean isTutorAvailableForAppointment(int tutorId, LocalDateTime requestedStartTime, LocalDateTime requestedEndTime) {
         Result<TutorsRecord> tutorData = dslContext.fetch(TUTORS, TUTORS.ID.eq(tutorId));
         if (tutorData.isEmpty()) {
@@ -200,6 +230,13 @@ public class AppointmentService {
         return false;
     }
 
+    /**
+     * Deleting the appointment using AppointmentRequest
+     *
+     * @param appointmentRequest The appointment request to delete
+     * @return The status of the action
+     * @throws SQLException The appointment couldn't be deleted
+     */
     public ResponseEntity<HttpStatus> deleteAppointment(AppointmentRequest appointmentRequest) throws SQLException {
         if (StringUtils.isEmpty(appointmentRequest.getStudentEmail())
                 || StringUtils.isEmpty(appointmentRequest.getTutorEmail())
@@ -253,6 +290,7 @@ public class AppointmentService {
         }
     }
 
+
     public List<AppointmentResponse> getReminderAppointments() {
 
         // create a LocalDateTime object representing 15 minutes from now
@@ -277,6 +315,9 @@ public class AppointmentService {
         }
     }
 
+    /**
+     * The cleanup of the appointments
+     */
     public void cleanup() {
         try {
             // delete from table
@@ -287,6 +328,12 @@ public class AppointmentService {
         } catch (Exception ignored) {}
     }
 
+    /**
+     *  Build the appointment response using the appointmentsRecord
+     *
+     * @param appointmentsRecord The appointments record
+     * @return The appointments response
+     */
     private AppointmentResponse buildAppointmentResponse(AppointmentsRecord appointmentsRecord) {
         AppointmentResponse response = new AppointmentResponse();
 
