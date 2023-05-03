@@ -36,6 +36,11 @@ public class UserService {
         this.dslContext = dslContext;
     }
 
+    /**
+     * Get the user record using the email of the user
+     * @param email The User's email
+     * @return @{UserRecord}
+     */
     public UsersRecord get(String email) {
         Result<UsersRecord> userData = dslContext.fetch(onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS, onlinetutoring.com.teamelevenbackend.entity.tables.Users.USERS.EMAIL.eq(email));
         if (userData.isEmpty()) {
@@ -44,6 +49,11 @@ public class UserService {
         return userData.get(0);
     }
 
+    /**
+     * Get the user email using the id of the user
+     * @param id The id of the User
+     * @return   The Email of the User
+     */
     public String getEmailById(int id) {
         try {
             Result<UsersRecord> resUser = dslContext.fetch(USERS, USERS.ID.eq(id));
@@ -53,6 +63,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Get the user's email and password
+     * @param email The email of the user
+     * @return      The email and password of the user
+     */
     public Optional<AbstractAuthModel> findByEmail(String email) {
         Result<UsersRecord> result = dslContext.fetch(USERS, USERS.EMAIL.eq(email));
         if (result.isEmpty()) {
@@ -62,6 +77,13 @@ public class UserService {
         return Optional.of(new AbstractAuthModel(result.get(0).getEmail(), result.get(0).getPassword()));
     }
 
+    /**
+     * Delete the user using the email
+     *
+     * @param email The email of the user
+     * @return      The result of the request
+     * @throws SQLException The user could not be deleted
+     */
     public ResponseEntity<HttpStatus> deleteUser(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -96,6 +118,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Update the profile of the user using the updateProfileRequest
+     *
+     * @param updateProfileRequest The update profile request
+     * @return The result of the request of type Users
+     * @throws SQLException The user profile could not be updated
+     */
     public ResponseEntity<Users> updateProfile(UpdateProfileRequest updateProfileRequest) throws SQLException {
         if (StringUtils.isEmpty(updateProfileRequest.getEmail())
                 || StringUtils.isEmpty(updateProfileRequest.getfName())) {
@@ -127,6 +156,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Update the password of the user using the change PasswordRequest
+     *
+     * @param changePasswordRequest The changePasswordRequest
+     * @return The result of the request
+     * @throws SQLException The password couldn't be updated
+     */
     public ResponseEntity<HttpStatus> updatePassword(ChangePasswordRequest changePasswordRequest) throws SQLException {
         if (StringUtils.isEmpty(changePasswordRequest.getEmail())
                 || StringUtils.isEmpty(changePasswordRequest.getPassword())) {
@@ -157,6 +193,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Updating the total hours of the user
+     *
+     * @param user The record of the user
+     */
     public void updateTotalHours(UsersRecord user) {
         try {
             if (user == null) {
@@ -192,6 +233,12 @@ public class UserService {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Build the user using the userRecord
+     *
+     * @param usersRecord The record of the user
+     * @return The user
+     */
     private static Users buildUser(UsersRecord usersRecord) {
         Users response = new Users();
 

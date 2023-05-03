@@ -34,6 +34,13 @@ public class StudentService {
         this.tutorService = tutorService;
     }
 
+    /**
+     * Get the student using the email
+     *
+     * @param email The email of the student
+     * @return The student
+     * @throws SQLException Couldn't query the data
+     */
     public ResponseEntity<StudentUser> getStudentByEmail(String email) throws SQLException {
         if (StringUtils.isEmpty(email)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -54,6 +61,16 @@ public class StudentService {
         }
     }
 
+
+    /**
+     * The insertion into the students using the data
+     *
+     * @param id The id of the student
+     * @param favTutorIds The tutor ids of favorite tutors
+     * @param year The year of the student
+     * @return The result of the insertion
+     * @throws SQLException The student couldn't be inserted
+     */
     public boolean insertIntoStudents(int id, List<Integer> favTutorIds, int year) throws SQLException {
         try {
             if (this.isInvalidYear(year)) {
@@ -76,6 +93,13 @@ public class StudentService {
         }
     }
 
+    /**
+     * Updating the student using the UpdateStudentRequest
+     *
+     * @param updateStudentRequest The updateStudentRequest for the student
+     * @return The student
+     * @throws SQLException The student couldn't be updated
+     */
     public ResponseEntity<StudentUser> updateStudent(UpdateStudentRequest updateStudentRequest) throws SQLException {
         if (StringUtils.isEmpty(updateStudentRequest.getEmail()) || this.isInvalidYear(updateStudentRequest.getYear())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -99,6 +123,13 @@ public class StudentService {
         }
     }
 
+    /**
+     * Build student user using the data
+     *
+     * @param usersRecord The user record for the student
+     * @param studentsRecord The student record for the student
+     * @return The student
+     */
     private StudentUser buildStudentUser(UsersRecord usersRecord, StudentsRecord studentsRecord) {
         StudentUser response = new StudentUser();
 
@@ -121,6 +152,12 @@ public class StudentService {
         return response;
     }
 
+    /**
+     * Checking if the year is invalid
+     *
+     * @param year The entered year
+     * @return Result stating if the year is invalid
+     */
     private boolean isInvalidYear(Integer year) {
         return !YEARS.contains(year);
     }
