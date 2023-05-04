@@ -23,6 +23,10 @@ import java.util.List;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PRODUCTION;
 
+/**
+ * Controller class that manages appointments.
+ * Contains endpoints for retrieving, creating, and deleting appointments.
+ */
 @Controller
 @RestController
 @RequestMapping("/appointments")
@@ -30,11 +34,19 @@ import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PR
 public class AppointmentController {
 
     private AppointmentService appointmentService;
+
     @Autowired
     public void setAppointmentService(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
 
+    /**
+     * Retrieves a list of appointments for a given email address.
+     *
+     * @param email  The email address for which to retrieve the list of appointments.
+     * @return ResponseEntity   Contains a list of appointments.
+     * @throws Exception   Appointment is not found.
+     */
     @GetMapping(value = "/list/{email}")
     public ResponseEntity<List<Appointments>> listAppointmentsByEmail(@PathVariable("email") String email) {
         try {
@@ -44,6 +56,14 @@ public class AppointmentController {
         }
     }
 
+    /**
+     * Retrieves a list of appointments for a given student and tutor email addresses.
+     *
+     * @param studentEmail  The email address of the student for which to retrieve the list of appointments.
+     * @param tutorEmail    The email address of the tutor for which to retrieve the list of appointments.
+     * @return: ResponseEntity  Contains a list of appointments.
+     * @throws Exception   Couldn't query the appointment data.
+     */
     @GetMapping(value = "/list")
     public ResponseEntity<List<Appointments>> getAppointment(@RequestParam String studentEmail,
                                                              @RequestParam String tutorEmail) {
@@ -54,6 +74,13 @@ public class AppointmentController {
         }
     }
 
+    /**
+     * Creates a new appointment based on the provided appointment request.
+     *
+     * @param appointmentRequest   The appointment request object containing the information for creating a new appointment.
+     * @return: a ResponseEntity  Contains the created appointment.
+     * @throws Exception   Couldn't create the appointment.
+     */
     @PostMapping(value = "/create")
     public ResponseEntity<Appointments> insertIntoAppointment(@RequestBody AppointmentRequest appointmentRequest) {
         try {
@@ -63,6 +90,13 @@ public class AppointmentController {
         }
     }
 
+    /**
+     * Deletes an appointment based on the provided appointment request.
+     *
+     * @param appointmentRequest  The appointment request object containing the information for deleting an appointment
+     * @return: ResponseEntity   Contains the status of the delete operation
+     * @throws Exception   Couldn't delete the appointment.
+     */
     @DeleteMapping(value = "/delete")
     public ResponseEntity<HttpStatus> deleteAppointment(@RequestBody AppointmentRequest appointmentRequest) {
         try {

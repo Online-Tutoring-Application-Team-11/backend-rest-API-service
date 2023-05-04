@@ -27,6 +27,9 @@ import java.util.List;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PRODUCTION;
 
+/**
+ * Controller class for handling requests related to tutors.
+ */
 @Controller
 @RestController
 @RequestMapping("/tutors")
@@ -39,6 +42,13 @@ public class TutorController {
         this.tutorService = tutorService;
     }
 
+    /**
+     * Retrieves a list of all tutors or tutors with a provided subject.
+     *
+     * @param subject   The subject (optional) for which to retrieve tutors.
+     * @return ResponseEntity  Contains a list of TutorUser objects.
+     * @throws Exception   Couldn't retrieve tutors.
+     */
     @GetMapping(value = "/get/all")
     public ResponseEntity<List<TutorUser>> getTutors(@RequestParam(required = false) String subject) {
         try {
@@ -48,6 +58,13 @@ public class TutorController {
         }
     }
 
+    /**
+     * Retrieves tutor information by email address.
+     *
+     * @param email The email address of the tutor to retrieve.
+     * @return ResponseEntity    Contains a TutorUser object.
+     * @throws Exception    Couldn't retrieve tutor information from the database.
+     */
     @GetMapping(value = "/get/{email}")
     public ResponseEntity<TutorUser> getTutor(@PathVariable(value = "email", required = false) String email) {
         try{
@@ -57,6 +74,13 @@ public class TutorController {
         }
     }
 
+    /**
+     * Updates tutor information.
+     *
+     * @param updateTutorRequest  A request object containing the updated tutor information.
+     * @return ResponseEntity    Contains updated TutorUser object.
+     * @throws Exception     Couldn't update tutor in the database.
+     */
     @PutMapping(value = "/update")
     public ResponseEntity<TutorUser> updateTutor(@RequestBody UpdateTutorRequest updateTutorRequest) {
         try {
@@ -66,6 +90,13 @@ public class TutorController {
         }
     }
 
+    /**
+     * Retrieves a tutor's available hours by email address.
+     *
+     * @param email  The email address of the tutor for which to retrieve available hours.
+     * @return ResponseEntity   Contains a list of AvailableHours objects.
+     * @throws Exception    Couldn't retrieve available hours information from the database.
+     */
     @GetMapping(value = "/get/{email}/available-hours")
     public ResponseEntity<List<AvailableHours>> getAvailableHours(@PathVariable(value = "email", required = false) String email) {
         try {
@@ -75,6 +106,13 @@ public class TutorController {
         }
     }
 
+    /**
+     * Modifies the available hours for a tutor.
+     *
+     * @param modifyAvailableHours  Object containing the tutor's email and the modified available hours
+     * @return ResponseEntity   Contains a list of the tutor's modified available hours.
+     * @throws Exception    Couldn't  modify the available hours.
+     */
     @PutMapping(value = "/available-hours/modify")
     public ResponseEntity<List<AvailableHours>> modifyAvailableHours(@RequestBody ModifyAvailableHours modifyAvailableHours) {
         try {
@@ -84,6 +122,15 @@ public class TutorController {
         }
     }
 
+    /**
+     * Deletes a tutor's available hours for a specific day and start time.
+     *
+     * @param email  The tutor's email.
+     * @param day   The day of the week for which the available hours should be deleted (optional)
+     * @param startTime  The start time for which the available hours should be deleted (optional)
+     * @return   ResponseEntity  Empty content to show deletion.
+     * @throws Exception    Couldn't delete available hours.
+     */
     @DeleteMapping(value = "/available-hours/{email}/delete")
     public ResponseEntity<HttpStatus> deleteAvailableHours(@PathVariable(value = "email", required = false) String email,
                                                            @RequestParam(required = false) Days day,
