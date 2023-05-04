@@ -50,7 +50,7 @@ public class EmailService {
                 " on " +
                 start.getMonth() + "/" + start.getDayOfMonth() + "/" + start.getYear() +
                 " at " +
-                start.getHour() + ":" + start.getMinute() + "hours." +
+                start.getHour() + ":" + start.getMinute() + " hours." +
                 "\n\nPlease visit our website @ " + WEBSITE +
                 " in case you want to cancel or reschedule.\n\n" +
                 END_REGARDS +
