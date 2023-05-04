@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_LOCAL;
 import static onlinetutoring.com.teamelevenbackend.utils.ControllerUtils.BASE_PRODUCTION;
 
+/**
+ * Controller class for handling requests related to user data and account management.
+ */
 @Controller
 @RestController
 @RequestMapping("/users")
@@ -35,6 +38,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    /**
+     * Deletes a user account identified by their email address.
+     *
+     * @param email  The email address of the user to be deleted.
+     * @return  ResponseEntity  Contains a success status code.
+     * @throws Exception   Couldn't delete the user account.
+     */
     @DeleteMapping(value = "/delete/{email}")
     @CacheEvict(allEntries = true)
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable(value = "email", required = false) String email) {
@@ -45,6 +55,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates a user's profile information.
+     *
+     * @param updateProfileRequest   The request object containing the updated user data.
+     * @return ResponseEntity   Contains the updated user data.
+     * @throws Exception    Couldn't update the user data.
+     */
     @PutMapping(value = "/update-profile")
     @CacheEvict(allEntries = true)
     public ResponseEntity<Users> updateProfile(@RequestBody UpdateProfileRequest updateProfileRequest) {
@@ -55,6 +72,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Changes a user's password.
+     *
+     * @param changePasswordRequest   The request object containing the user's current and new passwords.
+     * @return ResponseEntity   Contains a success status code.
+     * @throws Exception    Couldn't reset the password.
+     */
     @PutMapping(value = "/change-password")
     public ResponseEntity<HttpStatus> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         try {
