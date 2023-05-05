@@ -9,7 +9,7 @@ Backend Rest API Service Powered by Java and Spring for the Online Tutoring Appl
 3. `mvn clean install` [This is a maven project so click on the green button to download dependencies]
 <img width="885" alt="image" src="https://user-images.githubusercontent.com/55306116/236575280-2d5e5b0d-4940-49ca-b87e-132fbd3f9fad.png">
 
-4. Replace the contents of the application.properties file with the passwords provided in the submission
+4. Replace the contents of the `src/main/application.properties` file with the passwords provided in the submission
 5. Run the main function present in  `src/main/java/onlinetutoring/com/teamelevenbackend/TeamElevenBackendApplication.java` (click on the green button next to main to run the app)
 <img width="1353" alt="image" src="https://user-images.githubusercontent.com/55306116/236575389-70f6d087-0c3e-45e8-a434-004e98cec2b9.png">
 
